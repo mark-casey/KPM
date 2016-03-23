@@ -42,8 +42,8 @@ Vagrant.configure(2) do |config|
         maas.vm.box = "ubuntu/trusty64"
         maas.vm.hostname = "maas"
         # 'vagrant up' will prompt for interface choice if bridge(s) not set here
-        maas.vm.network :public_network, ip: '#{maasvm_ipminet_ip}' #, bridge: 'Intel(R) Ethernet Connection I217-LM'
-        maas.vm.network :public_network, ip: '#{maasvm_mgmtnet_ip}' #, bridge: 'Intel(R) Ethernet Connection I217-LM'
+        maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
+        maas.vm.network :public_network, ip: maasvm_mgmtnet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         maas.vm.provider "virtualbox" do |vbox|
             vbox.name = "maas"
             vbox.memory = "4096"
