@@ -5,14 +5,14 @@ if ENV['MAAS_ADMIN_USER']
     maas_admin_user = ENV['MAAS_ADMIN_USER']
     puts "Set MAAS Region Admin Username to '#{maas_admin_user}' from ENV var"
 else
-    maas_admin_user = admin
+    maas_admin_user = "admin"
 end
 
 if ENV['MAAS_ADMIN_EMAIL']
     maas_admin_email = ENV['MAAS_ADMIN_EMAIL']
     puts "Set MAAS Region Admin Email to '#{maas_admin_email}' from ENV var"
 else
-    maas_admin_email = admin@email.com
+    maas_admin_email = "admin@email.com"
 end
 
 if ENV['MAAS_ADMIN_PASS'] and ENV['MAAS_ADMIN_PASS'] != ''
@@ -20,7 +20,7 @@ if ENV['MAAS_ADMIN_PASS'] and ENV['MAAS_ADMIN_PASS'] != ''
     system('export MAAS_ADMIN_PASS=""')
     puts "Set MAAS Region Admin Password from ENV var (and then cleared the ENV var)"
 else
-    maas_admin_pass = admin
+    maas_admin_pass = "admin"
 end
 
 Vagrant.configure(2) do |config|
