@@ -30,7 +30,7 @@ Vagrant.configure(2) do |config|
         # 'vagrant up' will prompt for interface choice if bridge(s) not set here
         maas.vm.network :public_network, ip: '10.100.0.16' #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         maas.vm.network :public_network, ip: '10.101.0.16' #, bridge: 'Intel(R) Ethernet Connection I217-LM'
-        maas.vm.network :private_network
+        maas.vm.network :private_network, ip: '192.168.56.100'
         #maas.vm.network :forwarded_port, guest: 80, host: 8080
         maas.vm.provider "virtualbox" do |vbox|
             vbox.name = "maas"
