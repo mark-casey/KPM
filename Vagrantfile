@@ -15,6 +15,13 @@ else
     maasvm_mgmtnet_ip = "10.101.0.16"
 end
 
+if ENV['MAASVM_DEFAULTGW_IP']
+    maasvm_defaultgw_ip = ENV['MAASVM_DEFAULTGW_IP']
+    puts "Set MAAS VM's default gateway IP to '#{maasvm_defaultgw_ip}' from ENV var"
+else
+    maasvm_defaultgw_ip = maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.1')
+end
+
 if ENV['MAAS_ADMIN_USER']
     maas_admin_user = ENV['MAAS_ADMIN_USER']
     puts "Set MAAS Region Admin Username to '#{maas_admin_user}' from ENV var"
@@ -51,12 +58,11 @@ Vagrant.configure(2) do |config|
 
         # move default route to bridged mgmt interface instead of NAT'ed eth0
         config.vm.provision "shell", run: "always", inline: <<-SHELL
+
             # remove non-local eth0 route(s)
             eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
 
-            # create var assuming a '.1' gateway IP on mgmt interface and create default route for it
-            mgmtnet_gwip="${MAASVM_MGMTNET_IP%.*}.1";
-            route add default gw "${mgmtnet_gwip}"
+            route add default gw #{maasvm_defaultgw_ip}
         SHELL
 
         config.vm.provision "shell", inline: <<-SHELL
