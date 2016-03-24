@@ -19,6 +19,7 @@ if ENV['MAASVM_DEFAULTGW_IP']
     maasvm_defaultgw_ip = ENV['MAASVM_DEFAULTGW_IP']
     puts "Set MAAS VM's default gateway IP to '#{maasvm_defaultgw_ip}' from ENV var"
 else
+    puts "ASSUMING that the MAAS VM's default gateway IP should be '#{maasvm_defaultgw_ip}' (based on mgmt IP)"
     maasvm_defaultgw_ip = maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.1')
 end
 
