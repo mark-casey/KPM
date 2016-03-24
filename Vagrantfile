@@ -48,6 +48,17 @@ Vagrant.configure(2) do |config|
             vbox.name = "maas"
             vbox.memory = "4096"
         end
+
+        # move default route to bridged mgmt interface instead of NAT'ed eth0
+        config.vm.provision "shell", run: "always", inline: <<-SHELL
+            # remove non-local eth0 route(s)
+            eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
+
+            # create var assuming a '.1' gateway IP on mgmt interface and create default route for it
+            mgmtnet_gwip="${MAASVM_MGMTNET_IP%.*}.1";
+            route add default gw "${mgmtnet_gwip}"
+        SHELL
+
         config.vm.provision "shell", inline: <<-SHELL
             apt-get -qy update
             apt-get -qy install software-properties-common python-software-properties
