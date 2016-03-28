@@ -84,6 +84,7 @@ Vagrant.configure(2) do |config|
         SHELL
     end
 
+    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
     config.vm.define "kd_reg", primary: true do |kd_reg|
         kd_reg.vm.provider "docker" do |d|
             d.image = "registry:2"
