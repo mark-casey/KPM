@@ -80,6 +80,7 @@ Vagrant.configure(2) do |config|
         maas.vm.provider "virtualbox" do |vbox|
             vbox.name = "maas"
             vbox.memory = "4096"
+            maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
         end
 
         # move default route to bridged mgmt interface instead of NAT'ed eth0
@@ -104,7 +105,6 @@ Vagrant.configure(2) do |config|
             apt-get -qy install maas
             maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
         SHELL
-        maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
     end
 
     #maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
