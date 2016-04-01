@@ -71,7 +71,7 @@ vagrant_host_mgmtnet_ip=`ip a | grep -o "inet #{maasvm_mgmtnet_ip.gsub(/\.[0-9]*
 
 # Update docker on Vagrant host to use the insecure docker registry container it is (or will be) running
 # This shouldn't trigger unless the unmodified line is seen via grep
-`grep -q '^#DOCKER_OPTS=' /etc/default/docker && sed -i 's/^.DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry #{vagrant_host_mgmtnet_ip}:5000"/' /etc/default/docker && service docker restart`
+`grep -q '^\#DOCKER_OPTS=' /etc/default/docker && sed -i 's/^.DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry #{vagrant_host_mgmtnet_ip}:5000"/' /etc/default/docker && service docker restart`
 
 Vagrant.configure(2) do |config|
 
