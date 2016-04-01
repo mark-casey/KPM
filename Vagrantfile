@@ -107,7 +107,7 @@ Vagrant.configure(2) do |config|
     end
 
     maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
-    puts maas_admin_apikey
+    #puts maas_admin_apikey
     
 #  config.vm.provider "docker" do |d|
 #    d.build_dir = "."
