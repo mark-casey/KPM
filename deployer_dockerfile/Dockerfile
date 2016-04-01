@@ -1,6 +1,6 @@
 FROM ubuntu:wily
 
-RUN ls && \
+RUN apt-get -q -y update && \
     apt-get -q -y install curl python-pip python-dev gcc && \
     curl -sSL https://get.docker.io | bash && \
     pip install -U ansible==1.9.4 docker-py && \
