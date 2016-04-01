@@ -80,7 +80,6 @@ Vagrant.configure(2) do |config|
         maas.vm.provider "virtualbox" do |vbox|
             vbox.name = "maas"
             vbox.memory = "4096"
-            maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
         end
 
         # move default route to bridged mgmt interface instead of NAT'ed eth0
@@ -118,7 +117,8 @@ Vagrant.configure(2) do |config|
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
     # Private Docker registry Vagrant guest
-    config.vm.define "kd_reg", primary: true do |kd_reg|
+    config.vm.define "kd_reg", primary: false do |kd_reg|
+        maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
         kd_reg.vm.provider "docker" do |d|
             d.image = "registry:2"
             d.name = "registry"
