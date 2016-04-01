@@ -66,7 +66,7 @@ else
     maas_admin_pass = "admin"
 end
 
-vagrant_host_mgmtnet_ip=`ip a | grep -o "inet #{maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '')}" | cut -d' ' -f2`
+vagrant_host_mgmtnet_ip=`ip a | grep -o "inet #{maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.')}[0-9]*" | cut -d' ' -f2`
 puts "#{vagrant_host_mgmtnet_ip}"
 #system("grep -q '^#DOCKER_OPTS=' /etc/default/docker && sed -i 's/^.DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry 10.101.0.15:5000"/' /etc/default/docker && maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.1')
 
