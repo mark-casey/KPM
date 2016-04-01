@@ -1,6 +1,6 @@
 FROM ubuntu:wily
 
-RUN mount --make-shared /run && \
+RUN ls && \
     curl -sSL https://get.docker.io | bash && \
     apt-get -q -y install python-pip python-dev gcc && \
     pip install -U ansible==1.9.4 docker-py && \
