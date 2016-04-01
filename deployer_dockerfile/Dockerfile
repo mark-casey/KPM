@@ -7,7 +7,7 @@ RUN apt-get -q -y update && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/ && \
-
+#sudo usermod -aG docker your-user
 
 # 'ARG' seems to be a very new option in Docker and Quay.io's version of Docker is complaining
 #ARG path="/var/work"
