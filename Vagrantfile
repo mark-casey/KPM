@@ -58,8 +58,7 @@ end
 if ENV['MAAS_ADMIN_PASS']
     if ENV['MAAS_ADMIN_PASS'] != ''
         maas_admin_pass = ENV['MAAS_ADMIN_PASS']
-        system('export MAAS_ADMIN_PASS=""')
-        puts "Set MAAS Region Admin Password from ENV var (and then cleared the ENV var)"
+        puts "Set MAAS Region Admin Password from ENV var"
     else
         puts "Error: MAAS_ADMIN_PASS variable cannot be an empty string"
     end
@@ -106,31 +105,30 @@ Vagrant.configure(2) do |config|
         SHELL
     end
 
-    #maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
-    #puts maas_admin_apikey
-    
-#  config.vm.provider "docker" do |d|
-#    d.build_dir = "."
-#  end
-
-    # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
-    #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
-
     # Private Docker registry Vagrant guest
     config.vm.define "kd_reg", primary: false do |kd_reg|
         maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
-        kd_reg.vm.provider "docker" do |d|
-            d.image = "registry:2"
-            d.name = "registry"
-            #d.ports = ["6379:6379", "8080:80"]
-            d.ports = ["5000:5000"]
-            #d.build_dir = "."
-            #d.has_ssh = false
+        kd_reg.vm.provider "docker" do |d1|
+            d1.image = "registry:2"
+            d1.name = "registry"
+            #d1.ports = ["6379:6379", "8080:80"]
+            d1.ports = ["5000:5000"]
+            #d1.build_dir = "."
+            #d1.has_ssh = false
         end
         #config.ssh.port = 22
     end
 
-    # Prefer Docker provider over virtualbox provider
-    config.vm.provider "virtualbox"
-    config.vm.provider "docker"
+    config.vm.define "deployer" do |deployer|
+        kd_reg.vm.provider "docker" do |d2|
+            d2.build_dir = "./deployer_dockerfile"
+            d2.remains_running = false
+            #d2.has_ssh = false
+            d2.env = {
+                "MAAS_ADMIN_APIKEY":`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
+            }
+            d2.cmd: ["exit"]
+            
+        end
+    end
 end
