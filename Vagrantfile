@@ -104,17 +104,10 @@ Vagrant.configure(2) do |config|
             apt-get -qy install maas
             maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
         SHELL
-
-        # Use the host_shell plugin to run a command against the MAAS VM via Vagrant ssh command to get the MAAS admin's apikey
-        maas.vm.provision "host_shell", run: "always", inline: <<-SHELL
-
-            export MAAS_ADMIN_APIKEY=$(vagrant ssh -c 'sudo maas-region-admin apikey --username #{maas_admin_user}' maas 2>&1 | head -n1)
-            hostname
-            echo "${MAAS_ADMIN_APIKEY}"
-
-        SHELL
-
     end
+
+    # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
+    system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
     # Switch default provider to docker
     ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
