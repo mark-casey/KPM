@@ -127,7 +127,7 @@ Vagrant.configure(2) do |config|
             d2.env = {
                 "MAAS_ADMIN_APIKEY":`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
             }
-            d2.cmd: ["exit"]
+            d2.cmd = ["exit"]
             
         end
     end
