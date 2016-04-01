@@ -1,9 +1,24 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Check if you have the good Vagrant version to use docker provider...
+#
+# Tooling to set up OpenStack on bare-metal using Kolla.
+#
+# Add a link to an image of the physical network layout here and also some explanation
+#
+#
+# This Vagrantfile consists of two Vagrant guest machines and a container image build:
+#   - The two Vagrant guests are:
+#      - A VM that runs Canonical's MAAS (Metal As A Service) pxe-boot and hardware management platform
+#      - A private docker registry container on the Vagrant host.
+#
+#   - The container image that is built will be used as Kolla's "deployment host"
+#
+
+# Make sure Vagrant is new enough to use the Docker provider...
 Vagrant.require_version ">= 1.6.0"
 
+# Declare default vars if not set in ENV already
 if ENV['MAASVM_IPMINET_IP']
     maasvm_ipminet_ip = ENV['MAASVM_IPMINET_IP']
     puts "Set MAAS VM's ipmi network IP to '#{maasvm_ipminet_ip}' from ENV var"
@@ -22,7 +37,7 @@ if ENV['MAASVM_DEFAULTGW_IP']
     maasvm_defaultgw_ip = ENV['MAASVM_DEFAULTGW_IP']
     puts "Set MAAS VM's default gateway IP to '#{maasvm_defaultgw_ip}' from ENV var"
 else
-    #puts "ASSUMING that the MAAS VM's default gateway IP should be '#{maasvm_defaultgw_ip}' (based on mgmt IP)"
+    # Assume that MAAS VM's default gateway IP should be first address of the network that management IP is on"
     maasvm_defaultgw_ip = maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.1')
 end
 
@@ -40,19 +55,25 @@ else
     maas_admin_email = "admin@email.com"
 end
 
-if ENV['MAAS_ADMIN_PASS'] and ENV['MAAS_ADMIN_PASS'] != ''
-    maas_admin_pass = ENV['MAAS_ADMIN_PASS']
-    system('export MAAS_ADMIN_PASS=""')
-    puts "Set MAAS Region Admin Password from ENV var (and then cleared the ENV var)"
+if ENV['MAAS_ADMIN_PASS']
+    if ENV['MAAS_ADMIN_PASS'] != ''
+        maas_admin_pass = ENV['MAAS_ADMIN_PASS']
+        system('export MAAS_ADMIN_PASS=""')
+        puts "Set MAAS Region Admin Password from ENV var (and then cleared the ENV var)"
+    else
+        puts "Error: MAAS_ADMIN_PASS variable cannot be an empty string"
 else
     maas_admin_pass = "admin"
 end
 
+
 Vagrant.configure(2) do |config|
+
+    # MAAS VM Vagrant guest
     config.vm.define "maas", primary: false do |maas|
         maas.vm.box = "ubuntu/trusty64"
         maas.vm.hostname = "maas"
-        # 'vagrant up' will prompt for interface choice if bridge(s) not set here
+        # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
         maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         maas.vm.network :public_network, ip: maasvm_mgmtnet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         maas.vm.provider "virtualbox" do |vbox|
@@ -82,9 +103,22 @@ Vagrant.configure(2) do |config|
             apt-get -qy install maas
             maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
         SHELL
+
+        # Use the host_shell plugin to run a command against the MAAS VM via Vagrant ssh command to get the MAAS admin's apikey
+        maas.vm.provision "host_shell", run: "always", inline: <<-SHELL
+
+            export MAAS_ADMIN_APIKEY=$(vagrant ssh -c 'sudo maas-region-admin apikey --username #{maas_admin_user}' maas 2>&1 | head -n1)
+            hostname
+            echo "${MAAS_ADMIN_APIKEY}"
+
+        SHELL
+
     end
 
+    # Switch default provider to docker
     ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
+
+    # Private Docker registry Vagrant guest
     config.vm.define "kd_reg", primary: true do |kd_reg|
         kd_reg.vm.provider "docker" do |d|
             d.image = "registry:2"
