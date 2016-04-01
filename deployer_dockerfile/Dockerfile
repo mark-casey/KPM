@@ -1,8 +1,8 @@
 FROM ubuntu:wily
 
 RUN ls && \
+    apt-get -q -y install curl python-pip python-dev gcc && \
     curl -sSL https://get.docker.io | bash && \
-    apt-get -q -y install python-pip python-dev gcc && \
     pip install -U ansible==1.9.4 docker-py && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
