@@ -106,6 +106,12 @@ Vagrant.configure(2) do |config|
         SHELL
     end
 
+    system('export MAAS_ADMIN_APIKEY=$(ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user})')
+
+#  config.vm.provider "docker" do |d|
+#    d.build_dir = "."
+#  end
+
     # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
@@ -121,4 +127,8 @@ Vagrant.configure(2) do |config|
         end
         #config.ssh.port = 22
     end
+
+    # Prefer Docker provider over virtualbox provider
+    config.vm.provider "docker"
+    config.vm.provider "virtualbox"
 end
