@@ -119,8 +119,8 @@ Vagrant.configure(2) do |config|
         #config.ssh.port = 22
     end
 
-    config.vm.define "deployer" do |deployer|
-        kd_reg.vm.provider "docker" do |d2|
+    config.vm.define "deployer", primary: false do |deployer|
+        deployer.vm.provider "docker" do |d2|
             d2.build_dir = "./deployer_dockerfile"
             d2.remains_running = false
             #d2.has_ssh = false
