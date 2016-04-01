@@ -70,7 +70,7 @@ end
 Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
-    config.vm.provider "virtualbox" "maas", primary: false do |maas|
+    config.vm.define "maas", primary: false do |maas|
         maas.vm.box = "ubuntu/trusty64"
         maas.vm.hostname = "maas"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
