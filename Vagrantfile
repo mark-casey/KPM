@@ -70,40 +70,40 @@ end
 Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
-    config.vm.define "maas", primary: false do |maas|
-        maas.vm.box = "ubuntu/trusty64"
-        maas.vm.hostname = "maas"
-        # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
-        maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
-        maas.vm.network :public_network, ip: maasvm_mgmtnet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
-        maas.vm.network :forwarded_port, guest: 22, host: 2961, id: "ssh"
-        maas.vm.provider "virtualbox" do |vbox|
-            vbox.name = "maas"
-            vbox.memory = "4096"
+    config.vm.provider "virtualbox" do |vbox|
+        config.vm.define "maas", primary: false do |maas|
+            maas.vm.box = "ubuntu/trusty64"
+            maas.vm.hostname = "maas"
+            # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
+            maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
+            maas.vm.network :public_network, ip: maasvm_mgmtnet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
+            maas.vm.network :forwarded_port, guest: 22, host: 2961, id: "ssh"
+            maas.name = "maas"
+            maas.memory = "4096"
+
+            # move default route to bridged mgmt interface instead of NAT'ed eth0
+            maas.vm.provision "shell", run: "always", inline: <<-SHELL
+
+                # remove non-local eth0 route(s)
+                eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
+
+                route add default gw #{maasvm_defaultgw_ip}
+            SHELL
+
+            maas.vm.provision "shell", inline: <<-SHELL
+                apt-get -qy update
+                apt-get -qy install software-properties-common python-software-properties
+
+                add-apt-repository -y ppa:maas/stable
+                apt-get -qy update
+
+                # in a Vagrant environment these two values can get set to the IP of the wrong interface
+                echo "maas-cluster-controller maas-cluster-controller/maas-url string http://#{maasvm_mgmtnet_ip}/MAAS" | sudo debconf-set-selections
+                echo "maas-region-controller-min maas/default-maas-url string #{maasvm_mgmtnet_ip}" | sudo debconf-set-selections
+                apt-get -qy install maas
+                maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
+            SHELL
         end
-
-        # move default route to bridged mgmt interface instead of NAT'ed eth0
-        maas.vm.provision "shell", run: "always", inline: <<-SHELL
-
-            # remove non-local eth0 route(s)
-            eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
-
-            route add default gw #{maasvm_defaultgw_ip}
-        SHELL
-
-        maas.vm.provision "shell", inline: <<-SHELL
-            apt-get -qy update
-            apt-get -qy install software-properties-common python-software-properties
-
-            add-apt-repository -y ppa:maas/stable
-            apt-get -qy update
-
-            # in a Vagrant environment these two values can get set to the IP of the wrong interface
-            echo "maas-cluster-controller maas-cluster-controller/maas-url string http://#{maasvm_mgmtnet_ip}/MAAS" | sudo debconf-set-selections
-            echo "maas-region-controller-min maas/default-maas-url string #{maasvm_mgmtnet_ip}" | sudo debconf-set-selections
-            apt-get -qy install maas
-            maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
-        SHELL
     end
 
     maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
