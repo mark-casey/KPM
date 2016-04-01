@@ -62,6 +62,7 @@ if ENV['MAAS_ADMIN_PASS']
         puts "Set MAAS Region Admin Password from ENV var (and then cleared the ENV var)"
     else
         puts "Error: MAAS_ADMIN_PASS variable cannot be an empty string"
+    end
 else
     maas_admin_pass = "admin"
 end
