@@ -117,19 +117,19 @@ Vagrant.configure(2) do |config|
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
     # Private Docker registry Vagrant guest
-    config.vm.define "kd_reg", primary: true do |kd_reg|
-        kd_reg.vm.provider "docker" do |d|
-            d.image = "registry:2"
-            d.name = "registry"
-            #d.ports = ["6379:6379", "8080:80"]
-            d.ports = ["5000:5000"]
-            #d.build_dir = "."
-            #d.has_ssh = false
+    config.vm.provider "docker" do |d|
+        d.vm.define "kd_reg", primary: true do |kd_reg|
+            kd_reg.image = "registry:2"
+            kd_reg.name = "registry"
+            #kd_reg.ports = ["6379:6379", "8080:80"]
+            kd_reg.ports = ["5000:5000"]
+            #kd_reg.build_dir = "."
+            #kd_reg.has_ssh = false
         end
         #config.ssh.port = 22
     end
 
     # Prefer Docker provider over virtualbox provider
-    config.vm.provider "virtualbox"
-    config.vm.provider "docker"
+    #config.vm.provider "virtualbox"
+    #config.vm.provider "docker"
 end
