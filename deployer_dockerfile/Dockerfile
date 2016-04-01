@@ -8,7 +8,7 @@ RUN apt-get -q -y update && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/ && \
-    sed -i 's/.*DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry 10.101.0.15:5000"/' /etc/default/docker
+    sed -i 's/^.DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry 10.101.0.15:5000"/' /etc/default/docker
 #sudo usermod -aG docker your-user
 
 # 'ARG' seems to be a very new option in Docker and Quay.io's version of Docker is complaining
