@@ -67,14 +67,10 @@ else
     maas_admin_pass = "admin"
 end
 
-
 Vagrant.configure(2) do |config|
 
-    # Ensure default provider is now virtualbox
-    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
-
     # MAAS VM Vagrant guest
-    config.vm.define "maas", primary: false do |maas|
+    config.vm.provider "virtualbox" "maas", primary: false do |maas|
         maas.vm.box = "ubuntu/trusty64"
         maas.vm.hostname = "maas"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
@@ -111,9 +107,6 @@ Vagrant.configure(2) do |config|
 
     # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
-
-    # Ensure default provider is now docker
-    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 
     # Private Docker registry Vagrant guest
     config.vm.define "kd_reg", primary: true do |kd_reg|
