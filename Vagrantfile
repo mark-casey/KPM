@@ -130,6 +130,6 @@ Vagrant.configure(2) do |config|
     end
 
     # Prefer Docker provider over virtualbox provider
-    config.vm.provider "docker"
     config.vm.provider "virtualbox"
+    config.vm.provider "docker"
 end
