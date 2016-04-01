@@ -104,9 +104,10 @@ Vagrant.configure(2) do |config|
                 maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
             SHELL
         end
+        maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
     end
 
-    maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
+    #maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
     #puts maas_admin_apikey
     
 #  config.vm.provider "docker" do |d|
@@ -116,7 +117,6 @@ Vagrant.configure(2) do |config|
     # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
-    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
     # Private Docker registry Vagrant guest
     config.vm.provider "docker" do |d|
         d.vm.define "kd_reg", primary: true do |kd_reg|
