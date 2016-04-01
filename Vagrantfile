@@ -116,6 +116,7 @@ Vagrant.configure(2) do |config|
     # If MAAS VM is running, run a command against it via Vagrant ssh command to get the MAAS admin's apikey
     #system('if [ $(vagrant status maas | grep "maas.*running (" &>/dev/null) ]; then export MAAS_ADMIN_APIKEY=$(vagrant ssh -c "sudo maas-region-admin apikey --username #{maas_admin_user}" maas 2>&1 | head -n1) && hostname && echo "${MAAS_ADMIN_APIKEY}"; fi')
 
+    ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
     # Private Docker registry Vagrant guest
     config.vm.provider "docker" do |d|
         d.vm.define "kd_reg", primary: true do |kd_reg|
