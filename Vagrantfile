@@ -106,10 +106,9 @@ Vagrant.configure(2) do |config|
         SHELL
     end
 
-    system('export MAAS_ADMIN_APIKEY=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username admin`&&echo ${MAAS_ADMIN_APIKEY}')
-    system('ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username admin')
-    system('echo ${MAAS_ADMIN_APIKEY}')
-
+    maas_admin_apikey=system('ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}')
+    puts '#{maas_admin_apikey}'
+    
 #  config.vm.provider "docker" do |d|
 #    d.build_dir = "."
 #  end
