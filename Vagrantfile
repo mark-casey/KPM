@@ -66,13 +66,6 @@ else
     maas_admin_pass = "admin"
 end
 
-# Set variable for the IP on the Vagrant host that is in the same network as the MAAS VMs mgmt IP
-vagrant_host_mgmtnet_ip=`ip a | grep -o "inet #{maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.')}[0-9]*" | cut -d' ' -f2`
-puts "#{vagrant_host_mgmtnet_ip}"
-# Update docker on Vagrant host to use the insecure docker registry container it is (or will be) running
-# This shouldn't trigger unless the unmodified line is seen via grep
-`grep -q '^.DOCKER_OPTS=' /etc/default/docker && sed -i "s/^.DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry 10.101.0.15:5000'/" /etc/default/docker && service docker restart`
-
 Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
