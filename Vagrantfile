@@ -23,14 +23,14 @@ if ENV['MAASVM_IPMINET_IP']
     maasvm_ipminet_ip = ENV['MAASVM_IPMINET_IP']
     puts "Set MAAS VM's ipmi network IP to '#{maasvm_ipminet_ip}' from ENV var"
 else
-    maasvm_ipminet_ip = "10.100.0.16"
+    maasvm_ipminet_ip = "10.100.10.16"
 end
 
 if ENV['MAASVM_MGMTNET_IP']
     maasvm_mgmtnet_ip = ENV['MAASVM_MGMTNET_IP']
     puts "Set MAAS VM's mgmt network IP to '#{maasvm_mgmtnet_ip}' from ENV var"
 else
-    maasvm_mgmtnet_ip = "10.101.0.16"
+    maasvm_mgmtnet_ip = "10.101.10.16"
 end
 
 if ENV['MAASVM_DEFAULTGW_IP']
