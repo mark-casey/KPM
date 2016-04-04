@@ -37,11 +37,17 @@ sudo apt-get install libsdl1.2debian
 sudo su root -c "curl -sSL https://get.docker.io | bash"
 sudo usermod -aG docker luser
 
+# Set variable for the IP on the Vagrant host that is in the same network as the MAAS VMs mgmt IP
+vagrant_host_mgmtnet_ip=`ip a | grep -o "inet #{maasvm_mgmtnet_ip.gsub(/\.[0-9]*$/, '.')}[0-9]*" | cut -d' ' -f2`
+puts "#{vagrant_host_mgmtnet_ip}"
+# Update docker on Vagrant host to use the insecure docker registry container it is (or will be) running
+# This shouldn't trigger unless the unmodified line is seen via grep
+`grep -q '^.DOCKER_OPTS=' /etc/default/docker && sed -i "s/^.DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry 10.101.0.15:5000'/" /etc/default/docker && service docker restart`
+
 (exit and reopen)
 
 git clone https://github.com/ropsoft/kolla_from_vagrant.git
 cd kolla_from_vagrant
-
 
 export MAASVM_IPMINET_IP='10.100.10.16'
 export MAASVM_MGMTNET_IP='10.101.10.16'
@@ -50,5 +56,6 @@ export MAAS_ADMIN_USER='admin'
 export MAAS_ADMIN_EMAIL='admin@example.com'
 export MAAS_ADMIN_PASS='admin'
 
+vagrant up maas --provider=virtualbox
 vagrant up
 ```
