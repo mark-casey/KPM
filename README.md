@@ -7,56 +7,60 @@ with Kolla-specific infra run via Vagrant
  - Simple to redeploy
 
 # Software layout
-A single server (which will not run OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or etc.). Each of the following is a separate Vagrant guest using the Docker provider, except MAAS which uses the Virtualbox provider:
+A single server (which will not run OpenStack components - we'll call it the 'NOS'/Non OpenStack Server) is deployed with Vagrant, Docker, and Virtualbox (or etc.). Each of the following is a separate Vagrant guest using the Docker provider, except MAAS which uses the Virtualbox provider:
  - PXE and IPMI management are handled by Canonical's MAAS
  - Private Docker registry is run from Docker's registry:2 image
- - Kolla's deployment/operator host is also built. (Vagrant starts this container automatically as well, so we simply pass a runtime command of 'exit'.)
+ - Kolla's deployment/operator host is also built as a container. (Vagrant starts this container automatically as well, so we simply pass a runtime command of 'exit'.)
 
 
 # Physical network
 
 
 
+# Installation
 
- - Install an SSH server on the server then...
+ - Install an SSH server on the NOS then in an SSH terminal to it...
+
+        Override any of the optional vars that you do not want to use defaults for
+        ```
+        export NOS_MGMTNET_IP='10.101.10.15'
+        export MAASVM_IPMINET_IP='10.100.10.16'
+        export MAASVM_MGMTNET_IP='10.101.10.16'
+        #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if unset
+        #export MAAS_ADMIN_USER='admin'
+        #export MAAS_ADMIN_EMAIL='admin@example.com'
+        #export MAAS_ADMIN_PASS='admin'
+        ```
+
+        Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
 ```
 sudo apt-get -qy update
-sudo apt-get -qy install curl
+sudo apt-get -qy install curl git vim
 
 wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
 sudo dpkg -i vagrant_1.8.1_x86_64.deb
 
 wget http://download.virtualbox.org/virtualbox/4.3.36/virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
 sudo dpkg -i virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
-(watch for errors like)...
- virtualbox-4.3 depends on libsdl1.2debian (>= 1.2.11); however:
-  Package libsdl1.2debian is not installed.
-(then fix with)...
-sudo apt-get install libsdl1.2debian
+
+sudo apt-get install -f
 
 sudo su root -c "curl -sSL https://get.docker.io | bash"
 sudo usermod -aG docker user
-sudo sed -i 's/^#DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry 10.101.0.15:5000"/' /etc/default/docker
+sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${NOS_MGMTNET_IP}:5000'/" /etc/default/docker
 sudo service docker restart
 
-(exit and reopen)
+(exit and reopen SSH terminal for docker group changes to take effect)
 
 git clone https://github.com/ropsoft/kolla_from_vagrant.git
 cd kolla_from_vagrant
-
-export MAASVM_IPMINET_IP='10.100.10.16'
-export MAASVM_MGMTNET_IP='10.101.10.16'
-#export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if unset
-#export MAAS_ADMIN_USER='admin'
-#export MAAS_ADMIN_EMAIL='admin@example.com'
-#export MAAS_ADMIN_PASS='admin'
 
 vagrant up maas --provider=virtualbox
 vagrant up kd_reg --provider=docker
 vagrant up deployer --provider=docker
 
 # you can run this command in another terminal to save some time
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --base ubuntu --type source --registry 10.101.10.15:5000 --push"
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --base ubuntu --type source --registry ${NOS_MGMTNET_IP}:5000 --push"
 
 vagrant ssh maas
 
