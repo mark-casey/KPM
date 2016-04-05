@@ -21,7 +21,7 @@ A single server (which will not run OpenStack components - we'll call it the 'NO
 
  - Install an SSH server on the NOS then in an SSH terminal to it...
 
-        Override any of the optional vars that you do not want to use defaults for
+   Override any of the optional vars that you do not want to use defaults for
 
         ```
         export NOS_MGMTNET_IP='10.101.10.15'
@@ -33,7 +33,7 @@ A single server (which will not run OpenStack components - we'll call it the 'NO
         #export MAAS_ADMIN_PASS='admin'
         ```
 
-        Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
+   Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
 
         ```
         sudo apt-get -qy update
