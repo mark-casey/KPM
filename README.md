@@ -55,8 +55,33 @@ vagrant up maas --provider=virtualbox
 vagrant up kd_reg --provider=docker
 vagrant up deployer --provider=docker
 
-
+# you can run this command in another terminal to save some time
 docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --base ubuntu --type source --registry 10.101.10.15:5000 --push"
+
+vagrant ssh maas
+
+# workaround for partitioning bug on NVMe SSDs (https://bugs.launchpad.net/curtin/+bug/1401190)
+cat >> ~/b1401190.patch <<EOF
+--- /usr/lib/python2.7/dist-packages/curtin/commands/block_meta.py      2016-04-05 23:02:13.158079435 +0000
++++ /usr/lib/python2.7/dist-packages/curtin/commands/block_meta.py.mod  2016-04-05 23:23:13.642104142 +0000
+@@ -368,7 +368,12 @@
+         partnumber = determine_partition_number(vol.get('id'), storage_config)
+         disk_block_path = get_path_to_storage_volume(vol.get('device'),
+                                                      storage_config)
+-        volume_path = disk_block_path + str(partnumber)
++
++        if disk_block_path == '/dev/nvme0n1':
++            volume_path = disk_block_path + 'p' + str(partnumber)
++        else:
++            volume_path = disk_block_path + str(partnumber)
++
+         devsync_vol = os.path.join(disk_block_path)
+
+     elif vol.get('type') == "disk":
+EOF
+
+# http://unix.stackexchange.com/questions/167216/how-can-i-apply-a-p0-patch-from-any-working-directory
+(cd / && sudo patch -p0) < b1401190.patch
 
 
 ```
