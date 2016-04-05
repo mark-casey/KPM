@@ -7,7 +7,7 @@ RUN apt-get -q -y update && \
     #pip install -U ansible==1.9.4 docker-py && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
-    cp -r kolla/etc/kolla /etc/ && \
+    cp -r kolla/etc/kolla /etc/
     #sudo usermod -aG docker your-user
 
 # 'ARG' seems to be a very new option in Docker and Quay.io's version of Docker is complaining
@@ -18,7 +18,7 @@ RUN apt-get -q -y update && \
 
 #WORKDIR $path
 
-VOLUME /var/run/docker.sock
+#VOLUME /var/run/docker.sock
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
