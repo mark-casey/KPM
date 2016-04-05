@@ -21,7 +21,7 @@ A single server (which will not run OpenStack components - we'll call it the 'NO
 
  - Install an SSH server on the NOS then in an SSH terminal to it...
 
-   Override any of the optional vars that you do not want to use defaults for
+ - Override any of the optional vars that you do not want to use defaults for
 
     ```
     export NOS_MGMTNET_IP='10.101.10.15'
@@ -33,25 +33,25 @@ A single server (which will not run OpenStack components - we'll call it the 'NO
     #export MAAS_ADMIN_PASS='admin'
     ```
 
-   Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
+ - Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
 
-        ```
-        sudo apt-get -qy update
-        sudo apt-get -qy install curl git vim
-        
-        wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
-        sudo dpkg -i vagrant_1.8.1_x86_64.deb
-        
-        wget http://download.virtualbox.org/virtualbox/4.3.36/virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
-        sudo dpkg -i virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
-        
-        sudo apt-get install -f
-        
-        sudo su root -c "curl -sSL https://get.docker.io | bash"
-        sudo usermod -aG docker user
-        sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${NOS_MGMTNET_IP}:5000'/" /etc/default/docker
-        sudo service docker restart
-        ```
+    ```
+    sudo apt-get -qy update
+    sudo apt-get -qy install curl git vim
+    
+    wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
+    sudo dpkg -i vagrant_1.8.1_x86_64.deb
+    
+    wget http://download.virtualbox.org/virtualbox/4.3.36/virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
+    sudo dpkg -i virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
+    
+    sudo apt-get install -f
+    
+    sudo su root -c "curl -sSL https://get.docker.io | bash"
+    sudo usermod -aG docker user
+    sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${NOS_MGMTNET_IP}:5000'/" /etc/default/docker
+    sudo service docker restart
+    ```
 
 (exit and reopen SSH terminal for docker group changes to take effect)
 
