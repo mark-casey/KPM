@@ -126,7 +126,7 @@ Vagrant.configure(2) do |config|
             d2.env = {
                 "MAAS_ADMIN_APIKEY":`if [ -r ./.vagrant/machines/maas/virtualbox/private_key ]; then sudo maas-region-admin apikey --username #{maas_admin_user}; fi`
             }
-            d2.cmd = ["echo", "${MAAS_ADMIN_APIKEY}"]
+            d2.cmd = ["exit"]
         end
     end
 end
