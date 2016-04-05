@@ -10,7 +10,7 @@ with Kolla-specific infra run via Vagrant
 A single server (which will not run OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or etc.). Each of the following is a separate Vagrant guest using the Docker provider, except MAAS which uses the Virtualbox provider:
  - PXE and IPMI management are handled by Canonical's MAAS
  - Private Docker registry is run from Docker's registry:2 image
- - Kolla's deployment/operator host is also built. (Vagrant starts this container automatically as well, so we simply pass an runtime command of 'exit'.)
+ - Kolla's deployment/operator host is also built. (Vagrant starts this container automatically as well, so we simply pass a runtime command of 'exit'.)
 
 
 # Physical network
