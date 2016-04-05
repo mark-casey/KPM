@@ -107,7 +107,6 @@ Vagrant.configure(2) do |config|
 
     # Private Docker registry Vagrant guest
     config.vm.define "kd_reg", primary: false do |kd_reg|
-        maas_admin_apikey=`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
         kd_reg.vm.provider "docker" do |d1|
             d1.image = "registry:2"
             d1.name = "registry"
@@ -125,10 +124,9 @@ Vagrant.configure(2) do |config|
             d2.remains_running = false
             #d2.has_ssh = false
             d2.env = {
-                "MAAS_ADMIN_APIKEY":`ssh -q -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i .vagrant/machines/maas/virtualbox/private_key -p 2961 vagrant@127.0.0.1 sudo maas-region-admin apikey --username #{maas_admin_user}`
+                "MAAS_ADMIN_APIKEY":`if [ -r ./.vagrant/machines/maas/virtualbox/private_key ]; then sudo maas-region-admin apikey --username #{maas_admin_user}; fi`
             }
-            d2.cmd = ["exit"]
-            
+            d2.cmd = ["echo", "${MAAS_ADMIN_APIKEY}"]
         end
     end
 end
