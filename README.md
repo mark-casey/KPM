@@ -35,7 +35,7 @@ sudo dpkg -i virtualbox-4.3_4.3.36-105129~Ubuntu~raring_amd64.deb
 sudo apt-get install libsdl1.2debian
 
 sudo su root -c "curl -sSL https://get.docker.io | bash"
-sudo usermod -aG docker luser
+sudo usermod -aG docker user
 sudo sed -i 's/^#DOCKER_OPTS=.*/DOCKER_OPTS="--insecure-registry 10.101.0.15:5000"/' /etc/default/docker
 sudo service docker restart
 
