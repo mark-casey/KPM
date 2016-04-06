@@ -102,3 +102,8 @@ EOF
 
 exit #(from 'vagrant ssh maas')
 ```
+
+ - Use MAAS to put an OS on the target hosts and set SSH key, set up IPMI... etc.
+
+# Things not yet done/tested:
+ - add the target hosts to inventory and run kolla-ansible
