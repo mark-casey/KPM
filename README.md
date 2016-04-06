@@ -1,11 +1,6 @@
 ## "Semi-production" Kolla deploy
 with Kolla-specific infra run via Vagrant
 
-# Goals
- - Relatively simple layout
- - Manageability
- - Simple to redeploy
-
 # Jobs/Tasks/Software/Deployment Host layout
 A single host (which will not run OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product). This document will refer to this host as Kolla's deployment (or operator) host, even though technically the normal jobs performed by that host (plus a few) are really running as Vagrant guests on the host. These are arranged as follows:
  - Running via Vagrant's virtualbox provider:
