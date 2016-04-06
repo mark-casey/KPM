@@ -6,15 +6,23 @@ with Kolla-specific infra run via Vagrant
  - Manageability
  - Simple to redeploy
 
-# Software layout
-A single server (which will not run OpenStack components - we'll call it the 'NOS'/Non OpenStack Server) is deployed with Vagrant, Docker, and Virtualbox (or etc.). Each of the following is a separate Vagrant guest using the Docker provider, except MAAS which uses the Virtualbox provider:
- - PXE and IPMI management are handled by Canonical's MAAS
- - Private Docker registry is run from Docker's registry:2 image
- - Kolla's deployment/operator host is also built as a container. (Vagrant starts this container automatically as well, so we simply pass a runtime command of 'exit'.)
+# Jobs/Tasks/Software/Deployment Host layout
+A single host (which will not run OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product). This document will refer to this host as Kolla's deployment (or operator) host, even though technically the normal jobs performed by that host (plus a few) are really running as Vagrant guests on the host. These are arranged as follows:
+ - Running via Vagrant's virtualbox provider:
+     - PXE boot services and IPMI power management are handled by Canonical's MAAS
+ - Running via Vagrant's docker provider:
+     - Private Docker registry is run from Docker's registry:2 image [docker provider]
+     - Kolla's deployment/operator host is also built as a container. (Vagrant starts this container automatically [as that is just what it does when it finishes building from a Dockerfile], so we simply pass an overridden runtime command of 'exit'.)
+
 
 
 # Physical network
 
+vlans described here are on a d-link switch, which people have described as conceptually odd or backwards in their configuration (though they are still generally interoperable with gear from other brands)
+
+1. A vlan for management network - this is the network you get if you plug into the switch untagged. This network has Internet access behind a NAT router. Ansible's target addresses are in this network, and Kolla's management VIP is also chosen from this network. The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
+
+2. A vlan for IPMI network. If your hosts have dedicated IPMI NICs, the ports they plug into are untagged on the switch for this network. Other ports are set as tagged for this network as-needed (such as the uplink to the NAT router). DHCP for the IPMI network is provided by the NAT router (the existing test setup runs the DHCP server on a vlan interface added to the router for this network, so you may need more than a SOHO router to do this - Mikrotik RB450G in use here.)
 
 
 # Installation
