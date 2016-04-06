@@ -6,7 +6,7 @@ A single host (which will not run OpenStack components) is deployed with Vagrant
  - Running via Vagrant's virtualbox provider:
      - PXE boot services and IPMI power management are handled by Canonical's MAAS
  - Running via Vagrant's docker provider:
-     - Private Docker registry is run from Docker's registry:2 image [docker provider]
+     - Private Docker registry is run from Docker's registry:2 image
      - Kolla's deployment/operator host is also built as a container. (Vagrant starts this container automatically [as that is just what it does when it finishes building from a Dockerfile], so we simply pass an overridden runtime command of 'exit'.)
 
 
