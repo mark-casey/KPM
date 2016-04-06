@@ -15,9 +15,15 @@ A single host (which will not run OpenStack components) is deployed with Vagrant
 
 vlans described here are on a d-link switch, which people have described as conceptually odd or backwards in their configuration (though they are still generally interoperable with gear from other brands)
 
-1. A vlan for management network - this is the network you get if you plug into the switch untagged. This network has Internet access behind a NAT router. Ansible's target addresses are in this network, and Kolla's management VIP is also chosen from this network. The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
+1. A vlan for management network - this is the network you get if you plug into the switch untagged.
+  - This network has Internet access behind a NAT router
+  - Ansible's target addresses are in this network, and Kolla's management VIP is also chosen from this network
+  - The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
 
-2. A vlan for IPMI network. If your hosts have dedicated IPMI NICs, the ports they plug into are untagged on the switch for this network. Other ports are set as tagged for this network as-needed (such as the uplink to the NAT router). DHCP for the IPMI network is provided by the NAT router (the existing test setup runs the DHCP server on a vlan interface added to the router for this network, so you may need more than a SOHO router to do this - Mikrotik RB450G in use here.)
+2. A vlan for IPMI network.
+  - If your hosts have dedicated IPMI NICs, the ports they plug into are untagged on the switch for this network.
+  - Other ports are set as tagged for this network as-needed (such as the uplink to the NAT router).
+  - DHCP for the IPMI network is provided by the NAT router (the existing test setup runs the DHCP server on a vlan interface added to the router for this network, so you may need more than a SOHO router to do this - Mikrotik RB450G in use here.)
 
 
 # Installation
