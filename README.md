@@ -28,12 +28,12 @@ vlans described here are on a d-link switch, which people have described as conc
 
 # Installation
 
- - Install an SSH server on the NOS then in an SSH terminal to it...
+ - Install an SSH server on the deployment host then in an SSH terminal to it...
 
  - Override any of the optional vars that you do not want to use defaults for
 
     ```
-    export NOS_MGMTNET_IP='10.101.10.15'
+    export DPLYR_MGMTNET_IP='10.101.10.15'
     export MAASVM_IPMINET_IP='10.100.10.16'
     export MAASVM_MGMTNET_IP='10.101.10.16'
     #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if unset
@@ -58,7 +58,7 @@ vlans described here are on a d-link switch, which people have described as conc
     
     sudo su root -c "curl -sSL https://get.docker.io | bash"
     sudo usermod -aG docker user
-    sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${NOS_MGMTNET_IP}:5000'/" /etc/default/docker
+    sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${DPLYR_MGMTNET_IP}:5000'/" /etc/default/docker
     sudo service docker restart
     ```
 
@@ -73,7 +73,7 @@ vagrant up kd_reg --provider=docker
 vagrant up deployer --provider=docker
 
 # you can run this command in another terminal to save some time
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --no-cache --base ubuntu --type source --registry ${NOS_MGMTNET_IP}:5000 --push"
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --no-cache --base ubuntu --type source --registry ${DPLYR_MGMTNET_IP}:5000 --push"
 
 vagrant ssh maas
 
