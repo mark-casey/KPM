@@ -1,20 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#
-# Tooling to set up OpenStack on bare-metal using Kolla.
-#
-# Add a link to an image of the physical network layout here and also some explanation
-#
-#
-# This Vagrantfile consists of two Vagrant guest machines and a container image build:
-#   - The two Vagrant guests are:
-#      - A VM that runs Canonical's MAAS (Metal As A Service) pxe-boot and hardware management platform
-#      - A private docker registry container on the Vagrant host.
-#
-#   - The container image that is built will be used as Kolla's "deployment host"
-#
-
 # Make sure Vagrant is new enough to use the Docker provider...
 Vagrant.require_version ">= 1.6.0"
 
