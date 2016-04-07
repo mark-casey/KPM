@@ -71,7 +71,7 @@ Vagrant.configure(2) do |config|
         maas.vm.provision "shell", run: "always", inline: <<-SHELL
 
             # remove non-local eth0 route(s)
-            eval `route -n | awk '{ (if $8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
+            eval `route -n | awk '{ if ($8 ==\"eth0\" && $2 != \"0.0.0.0\") print \"route del default gw \" $2; }'`
 
             route add default gw #{maasvm_defaultgw_ip}
         SHELL
