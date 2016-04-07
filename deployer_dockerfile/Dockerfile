@@ -7,8 +7,8 @@ RUN apt-get -q -y update && \
     #pip install -U ansible==1.9.4 docker-py && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
-    cp -r kolla/etc/kolla /etc/ && \
-    echo "${MAAS_ADMIN_APIKEY]" > /tmp/MAAS_ADMIN_APIKEY
+    cp -r kolla/etc/kolla /etc/
+    #echo "${MAAS_ADMIN_APIKEY]" > /tmp/MAAS_ADMIN_APIKEY
     #sudo usermod -aG docker your-user
 
 # 'ARG' seems to be a very new option in Docker and Quay.io's version of Docker is complaining
