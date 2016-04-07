@@ -58,7 +58,15 @@ vlans described here are on a d-link switch, which people have described as conc
     
     sudo su root -c "curl -sSL https://get.docker.io | bash"
     sudo usermod -aG docker user
-    sudo sed -i "s/^#DOCKER_OPTS=.*/DOCKER_OPTS='--insecure-registry ${DPLYR_MGMTNET_IP}:5000'/" /etc/default/docker
+    sudo mkdir -p /lib/systemd/system/docker.service.d
+    sudo tee /lib/systemd/system/docker.service.d/kolla.conf <<-EOF
+    [Service]
+    ExecStart=
+    ExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry ${DPLYR_MGMTNET_IP}:5000
+    MountFlags=
+    MountFlags=shared
+    EOF
+    sudo systemctl daemon-reload
     sudo service docker restart
     ```
 
