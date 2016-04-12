@@ -8,16 +8,9 @@ RUN apt-get -q -y update && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/
-    #echo "${MAAS_ADMIN_APIKEY]" > /tmp/MAAS_ADMIN_APIKEY
     #sudo usermod -aG docker your-user
 
-# 'ARG' seems to be a very new option in Docker and Quay.io's version of Docker is complaining
-#ARG path="/var/work"
-#ENV path="/var/work"
-
-#RUN mkdir -p $path
-
-#WORKDIR $path
+ENV MAAS_ADMIN_APIKEY="${MAAS_ADMIN_APIKEY}"
 
 #VOLUME /var/run/docker.sock
 
