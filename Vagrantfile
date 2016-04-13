@@ -88,6 +88,11 @@ Vagrant.configure(2) do |config|
             echo "maas-region-controller-min maas/default-maas-url string #{maasvm_mgmtnet_ip}" | sudo debconf-set-selections
             apt-get -qy install maas
             maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
+            env | grep MAAS
+            export MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}/api/2.0"
+            export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username #{maas_admin_user})"
+            env | grep MAAS
+            sed -ie "s,_url_find_replace_unique_,${MAASVM_API_URL}," -e "s,_token_find_replace_unique_,${MAASVM_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
         SHELL
     end
 
@@ -109,9 +114,6 @@ Vagrant.configure(2) do |config|
             d2.build_dir = "./deployer_dockerfile"
             d2.remains_running = false
             #d2.has_ssh = false
-            d2.env = {
-                "MAAS_ADMIN_APIKEY":`if [ -r ./.vagrant/machines/maas/virtualbox/private_key ]; then sudo maas-region-admin apikey --username #{maas_admin_user}; fi`
-            }
             d2.cmd = ["exit"]
         end
     end
