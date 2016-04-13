@@ -92,7 +92,8 @@ Vagrant.configure(2) do |config|
             export MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}/api/2.0"
             export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username #{maas_admin_user})"
             env | grep MAAS
-            sed -ie "s,_url_find_replace_unique_,${MAASVM_API_URL}," -e "s,_token_find_replace_unique_,${MAASVM_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+            sed -i "s/_url_find_replace_unique_/${MAASVM_API_URL}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+            sed -i "s/_token_find_replace_unique_/${MAASVM_ADMIN_APIKEY}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
         SHELL
     end
 
