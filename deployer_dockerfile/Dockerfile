@@ -10,7 +10,7 @@ RUN apt-get -q -y update && \
     cp -r kolla/etc/kolla /etc/
     #sudo usermod -aG docker your-user
 
-ADD ansible_maas_dynamic_inventory.py
+ADD ansible_maas_dynamic_inventory.py /root/
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
