@@ -10,9 +10,7 @@ RUN apt-get -q -y update && \
     cp -r kolla/etc/kolla /etc/
     #sudo usermod -aG docker your-user
 
-ENV MAAS_ADMIN_APIKEY="${MAAS_ADMIN_APIKEY}"
-
-#VOLUME /var/run/docker.sock
+ADD ansible_maas_dynamic_inventory.py
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
