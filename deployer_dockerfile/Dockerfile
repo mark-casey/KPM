@@ -8,7 +8,7 @@ RUN apt-get -q -y update && \
     git clone https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/ && \
-    kolla-genpwd && \
+    kolla-genpwd
     #sudo usermod -aG docker your-user
 
 ADD ansible_maas_dynamic_inventory.py /usr/local/share/kolla/ansible/inventory
