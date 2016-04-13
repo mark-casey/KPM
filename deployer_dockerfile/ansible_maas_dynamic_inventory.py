@@ -28,8 +28,8 @@ import requests
 class Inventory:
 
     def __init__(self):
-        self.maas = "_url_find_replace_"
-        self.token = "_token_find_replace_"
+        self.maas = "_url_find_replace_unique_"
+        self.token = "_token_find_replace_unique_"
         self.args = None
 
         # Parse command line arguments
