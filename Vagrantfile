@@ -81,7 +81,7 @@ Vagrant.configure(2) do |config|
             MAASVM_IPMINET_IP=#{maasvm_ipminet_ip}
             MAASVM_MGMTNET_IP=#{maasvm_mgmtnet_ip}
             MAASVM_DEFAULTGW_IP=#{maasvm_defaultgw_ip}
-            MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}:5240/MAAS/api/1.0"
+            MAASVM_API_URL="http:\\/\\/#{maasvm_mgmtnet_ip}:5240\\/MAAS\\/api\\/1.0"
             MAAS_ADMIN_USER=#{maas_admin_user}
             MAAS_ADMIN_EMAIL=#{maas_admin_email}
             MAAS_ADMIN_PASS=#{maas_admin_pass}
@@ -114,8 +114,8 @@ Vagrant.configure(2) do |config|
 
             maas "${MAAS_ADMIN_USER}" boot-resources import
 
-            sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
-            sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+            sed -i "s/_url_find_replace_unique_/${MAASVM_API_URL}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+            sed -i "s/_token_find_replace_unique_/${MAAS_ADMIN_APIKEY}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
 
         SHELL
     end
