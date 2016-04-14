@@ -77,6 +77,15 @@ Vagrant.configure(2) do |config|
         SHELL
 
         maas.vm.provision "shell", inline: <<-SHELL
+            # set up env (FIXME: need to see if we can get rid of the intermediate ruby var step or otherwise simplify)
+            MAASVM_IPMINET_IP=#{maasvm_ipminet_ip}
+            MAASVM_MGMTNET_IP=#{maasvm_mgmtnet_ip}
+            MAASVM_DEFAULTGW_IP=#{maasvm_defaultgw_ip}
+            MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}:5240/MAAS/api/1.0"
+            MAAS_ADMIN_USER=#{maas_admin_user}
+            MAAS_ADMIN_EMAIL=#{maas_admin_email}
+            MAAS_ADMIN_PASS=#{maas_admin_pass}
+            
             apt-get -qy update
             apt-get -qy install software-properties-common python-software-properties
 
@@ -84,14 +93,30 @@ Vagrant.configure(2) do |config|
             apt-get -qy update
 
             # in a Vagrant environment these two values can get set to the IP of the wrong interface
-            echo "maas-cluster-controller maas-cluster-controller/maas-url string http://#{maasvm_mgmtnet_ip}/MAAS" | sudo debconf-set-selections
-            echo "maas-region-controller-min maas/default-maas-url string #{maasvm_mgmtnet_ip}" | sudo debconf-set-selections
+            echo "maas-cluster-controller maas-cluster-controller/maas-url string http://${MAASVM_MGMTNET_IP}/MAAS" | sudo debconf-set-selections
+            echo "maas-region-controller-min maas/default-maas-url string ${MAASVM_MGMTNET_IP}" | sudo debconf-set-selections
             apt-get -qy install maas
-            maas-region-admin createadmin --username=#{maas_admin_user} --email=#{maas_admin_email} --password=#{maas_admin_pass}
-            export MAASVM_API_URL="http:\\/\\/#{maasvm_mgmtnet_ip}\\/api\\/2.0"
-            export MAASVM_ADMIN_APIKEY="$(maas-region-admin apikey --username #{maas_admin_user})"
-            sed -i "s/_url_find_replace_unique_/${MAASVM_API_URL}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
-            sed -i "s/_token_find_replace_unique_/${MAASVM_ADMIN_APIKEY}/" /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+
+            maas-region-admin createadmin --username=${MAAS_ADMIN_USER} --email=${MAAS_ADMIN_EMAIL} --password=${MAAS_ADMIN_PASS}
+            MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
+
+            maas login "${MAAS_ADMIN_USER}" "${MAASVM_API_URL}" ${MAAS_ADMIN_APIKEY}"
+            maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
+
+            # This CentOS stuff should be working I just don't need it
+            #apt-get -qy install bzr make python-virtualenv
+            #bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
+            #cd maas-image-builder
+            #make install-dependencies
+            #make
+            #maas-image-builder -a amd64 -o centos7-amd64-root-tgz centos --edition 7
+            #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
+
+            maas "${MAAS_ADMIN_USER}" boot-resources import
+
+            sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+            sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+
         SHELL
     end
 
