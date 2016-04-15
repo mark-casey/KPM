@@ -104,7 +104,7 @@ Vagrant.configure(2) do |config|
 
             sleep 1
             maas login "${MAAS_ADMIN_USER}" "${MAASVM_API_URL}" "${MAAS_ADMIN_APIKEY}"
-            sleep 1
+            sleep 3
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
 
             # This CentOS stuff should be working I just don't need it
