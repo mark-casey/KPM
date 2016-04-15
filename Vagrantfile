@@ -106,22 +106,36 @@ Vagrant.configure(2) do |config|
             maas login "${MAAS_ADMIN_USER}" "${MAASVM_API_URL}" "${MAAS_ADMIN_APIKEY}"
             sleep 3
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
-
-            # This CentOS stuff should be working I just don't need it
-            apt-get -qy install bzr make python-virtualenv python-pip
-            bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
-            # 'python-stevedore' is the name of the apt package, not the Py package (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
-            sed -i 's/python-stevedore/stevedore/' maas-image-builder/setup.py
-            pip install maas-image-builder/
-            cd maas-image-builder/ && make install-dependencies && cd -
-            maas-image-builder -h #-a amd64 -o centos7-amd64-root-tgz centos --edition 7
-            sleep 2
-            #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
             sleep 2
             maas "${MAAS_ADMIN_USER}" boot-resources import
 
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
             sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
+
+            #exit 0  # comment this out to let the next section run
+
+            ### CentOS images in MAAS
+            # April 15, 2016:
+            #  - maas-image-builder compiles using the steps here which work around issue(s).
+            #  - maas-image-builder project seems a little neglected at this time (hoping
+            #    there is a replacement coming or something).
+            #  - I had to create virbr0 and eth2 to it using virsh to get the call to
+            #    maas-image-builder to make much progress.
+            #  - The installer had booted and made real progress before it seemed to get unhappy.
+            #  - I killed the installer/VM when it ran into issues; the fact I was trying to
+            #    build the image using QEUM inside a VBox may have been causing several issues.
+            #
+            apt-get -qy install bzr make python-virtualenv python-pip
+            bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
+            # 'python-stevedore' is the name of the apt package, not the Py package (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
+            sed -i "s,python-stevedore,stevedore," maas-image-builder/setup.py
+            pip install maas-image-builder/
+            # AppArmor doesn't allow qemu to access /tmp, so /var/lib/libvirt/images/<temppath> is chosen instead (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
+            sed -i "s,\(tempdir.*\)location=None,\1location=b'/var/lib/libvirt/images'," /usr/local/lib/python2.7/dist-packages/mib/utils.py
+            cd maas-image-builder/ && make install-dependencies && cd -
+            #maas-image-builder -a amd64 -o centos7-amd64-root-tgz centos --edition 7
+            sleep 2
+            #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
 
         SHELL
     end
