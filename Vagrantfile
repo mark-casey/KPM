@@ -109,11 +109,13 @@ Vagrant.configure(2) do |config|
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
             sleep 3
             maas "${MAAS_ADMIN_USER}" boot-resources import
+            sleep 3
+            maas "${MAAS_ADMIN_USER}" logout
 
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
             sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
 
-            #exit 0  # comment this out to let the next section run
+            exit 0  # comment this out to let the next section run
 
             ### CentOS images in MAAS
             # April 15, 2016:
