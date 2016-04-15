@@ -97,10 +97,14 @@ Vagrant.configure(2) do |config|
             echo "maas-region-controller-min maas/default-maas-url string ${MAASVM_MGMTNET_IP}" | sudo debconf-set-selections
             apt-get -qy install maas
 
+            # calls to sleep from here on are to keep from moving faster than MAAS will keep up
             maas-region-admin createadmin --username=${MAAS_ADMIN_USER} --email=${MAAS_ADMIN_EMAIL} --password=${MAAS_ADMIN_PASS}
+            sleep 1
             MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
 
+            sleep 1
             maas login "${MAAS_ADMIN_USER}" "${MAASVM_API_URL}" "${MAAS_ADMIN_APIKEY}"
+            sleep 1
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
 
             # This CentOS stuff should be working I just don't need it
@@ -112,6 +116,7 @@ Vagrant.configure(2) do |config|
             #maas-image-builder -a amd64 -o centos7-amd64-root-tgz centos --edition 7
             #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
 
+            sleep 1
             maas "${MAAS_ADMIN_USER}" boot-resources import
 
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
