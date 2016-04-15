@@ -108,12 +108,14 @@ Vagrant.configure(2) do |config|
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
 
             # This CentOS stuff should be working I just don't need it
-            #apt-get -qy install bzr make python-virtualenv
-            #bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
-            #cd maas-image-builder
-            #make install-dependencies
-            #make
-            #maas-image-builder -a amd64 -o centos7-amd64-root-tgz centos --edition 7
+            apt-get -qy install bzr make python-virtualenv python-pip
+            bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
+            # 'python-stevedore' is the name of the apt package, not the Py package (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
+            sed -i 's/python-stevedore/stevedore/' maas-image-builder/setup.py
+            pip install maas-image-builder/
+            sleep 2
+            maas-image-builder -h #-a amd64 -o centos7-amd64-root-tgz centos --edition 7
+            sleep 2
             #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
 
             sleep 2
