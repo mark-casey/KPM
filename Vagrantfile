@@ -113,11 +113,10 @@ Vagrant.configure(2) do |config|
             # 'python-stevedore' is the name of the apt package, not the Py package (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
             sed -i 's/python-stevedore/stevedore/' maas-image-builder/setup.py
             pip install maas-image-builder/
-            sleep 2
+            cd maas-image-builder/ && make install-dependencies && cd -
             maas-image-builder -h #-a amd64 -o centos7-amd64-root-tgz centos --edition 7
             sleep 2
             #maas "${MAAS_ADMIN_USER}" boot-resources create name=centos/centos7 architecture=amd64/generic content@=./build-output/centos7-amd64-root-tgz
-
             sleep 2
             maas "${MAAS_ADMIN_USER}" boot-resources import
 
