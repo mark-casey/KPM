@@ -98,15 +98,16 @@ Vagrant.configure(2) do |config|
             apt-get -qy install maas
 
             # calls to sleep from here on are to keep from moving faster than MAAS will keep up
+            sleep 3
             maas-region-admin createadmin --username=${MAAS_ADMIN_USER} --email=${MAAS_ADMIN_EMAIL} --password=${MAAS_ADMIN_PASS}
-            sleep 2
+            sleep 3
             MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
 
-            sleep 2
+            sleep 3
             maas login "${MAAS_ADMIN_USER}" "${MAASVM_API_URL}" "${MAAS_ADMIN_APIKEY}"
             sleep 3
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
-            sleep 2
+            sleep 3
             maas "${MAAS_ADMIN_USER}" boot-resources import
 
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
