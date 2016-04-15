@@ -132,6 +132,7 @@ Vagrant.configure(2) do |config|
             pip install maas-image-builder/
             # AppArmor doesn't allow qemu to access /tmp, so /var/lib/libvirt/images/<temppath> is chosen instead (https://code.launchpad.net/~ti-mo/maas-image-builder/maas-image-builder/+merge/278773 )
             sed -i "s,\(tempdir.*\)location=None,\1location=b'/var/lib/libvirt/images'," /usr/local/lib/python2.7/dist-packages/mib/utils.py
+            mkdir -p /var/lib/libvirt/images/
             cd maas-image-builder/ && make install-dependencies && cd -
             #maas-image-builder -a amd64 -o centos7-amd64-root-tgz centos --edition 7
             sleep 2
