@@ -114,11 +114,23 @@ EOF
 exit #(from 'vagrant ssh maas')
 ```
 
- - Use MAAS to put an OS on the target hosts and set SSH key, set up IPMI... etc.
-     - Begin image import
-     - Add SSH key to the user in MAAS interface
-     - Enable DHCP and DNS from MAAS on the mgmt interface
-     - PXE boot instances
+# Install OSes with MAAS
 
-# Things not yet done/tested:
- - add the target hosts to inventory and run kolla-ansible
+ - Configure BIOS of all target hosts to boot from the hard disk MAAS will install to, then shut them back down.
+ - Add public SSH key to the admin user (or the MAAS user you will be logged in as when deploying) in MAAS interface
+ - Enable DHCP and DNS from MAAS on the mgmt interface
+ - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE boot on each target host without making permanent changes to the boot order.
+ - In the MAAS interface, you will "Commission", "Acquire", and then "Deploy" the hosts.
+   - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
+   - Acquire: Assign the target hosts to this MAAS user.
+   - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
+ - Log into each host and copy the ubuntu user's key to root
+ - Tag hosts in MAAS
+
+# Test dynamic inventory from within deployer container
+
+# Deploy
+ - Configure globals
+ - Add ssh key to root user within deployer container and set perms
+ - Run kolla-ansible prechecks
+ - Run kolla-ansible deploy
