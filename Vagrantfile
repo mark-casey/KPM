@@ -127,6 +127,10 @@ Vagrant.configure(2) do |config|
             #  - The installer had booted and made real progress before it seemed to get unhappy.
             #  - I killed the installer/VM when it ran into issues; the fact I was trying to
             #    build the image using QEUM inside a VBox may have been causing several issues.
+            #  - You can also read in the 1.9.0 section of the MAAS changelog about using the daily
+            #    image stream at: 'http://maas.ubuntu.com/images/ephemeral-v2/daily/' as a source of
+            #    CentOS images for MAAS, but timestamps suggest these are not currently updated daily,
+            #    are rather old, and so could take a while to install updates during new deploys.
             #
             apt-get -qy install bzr make python-virtualenv python-pip
             bzr -Ossl.cert_reqs=none branch lp:maas-image-builder
