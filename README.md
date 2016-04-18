@@ -73,6 +73,7 @@ vlans described here are on a d-link switch, which people have described as conc
     ```
 
 (exit and reopen SSH terminal for docker group changes to take effect)
+(REMEMBER TO REDEFINE ANY ENV VARS FROM ABOVE THAT ARE LOST AT LOGOUT)
 
 ```
 git clone https://github.com/ropsoft/kolla_from_vagrant.git
