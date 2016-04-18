@@ -110,7 +110,7 @@ Vagrant.configure(2) do |config|
             sleep 3
             maas "${MAAS_ADMIN_USER}" boot-resources import
             sleep 3
-            maas logout
+            maas logout "${MAAS_ADMIN_USER}"
 
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
             sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/deployer_dockerfile/ansible_maas_dynamic_inventory.py
