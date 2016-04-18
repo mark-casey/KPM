@@ -56,6 +56,8 @@ vlans described here are on a d-link switch, which people have described as conc
     
     sudo apt-get install -f
     
+    sudo mount / -o remount,nobarrier,noatime,nodiratime
+    
     sudo su root -c "curl -sSL https://get.docker.io | bash"
     sudo usermod -aG docker user
     sudo mkdir -p /lib/systemd/system/docker.service.d
