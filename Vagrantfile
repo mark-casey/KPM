@@ -109,6 +109,8 @@ Vagrant.configure(2) do |config|
             maas "${MAAS_ADMIN_USER}" boot-source-selections create 1 os="ubuntu" release="wily" arches="amd64" subarches="*" labels="*"
             sleep 3
             maas "${MAAS_ADMIN_USER}" boot-resources import
+            #sleep 3
+            #set maas dhcp settings on mgmt interface; done in Readme for now using MAAS GUI
             sleep 3
             maas logout "${MAAS_ADMIN_USER}"
 
