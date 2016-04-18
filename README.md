@@ -84,7 +84,7 @@ vagrant up kd_reg --provider=docker
 vagrant up deployer --provider=docker
 
 # you can run this command in another terminal to save some time
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --no-cache --base ubuntu --type source --registry ${DPLYR_MGMTNET_IP}:5000 --push"
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --base ubuntu --type source --registry ${DPLYR_MGMTNET_IP}:5000 --push"
 
 vagrant ssh maas
 
