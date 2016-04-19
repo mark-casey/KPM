@@ -124,13 +124,31 @@ exit #(from 'vagrant ssh maas')
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
- - Log into each host and copy the ubuntu user's key to root
  - Tag hosts in MAAS
 
 # Test dynamic inventory from within deployer container
 
+
+
 # Deploy
+ - # docker run -it da8fdca3cea7
+   
+   ```
+   cd
+   kolla-genpwd
+   sed -i -e 's/^#*kolla_base_distro:.*/kolla_base_distro: "ubuntu"/' -e 's/^#*kolla_install_type:.*/kolla_install_type: "source"/' -e 's/^#*kolla_internal_vip_address:.*/kolla_internal_vip_address: "10.101.0.215"/' -e 's/^#*docker_registry:.*/docker_registry: "10.101.0.15:5000"/' /etc/kolla/globals.yml
+   mkdir .ssh
+   vim .ssh/id_rsa
+   chmod 600 .ssh/id_rsa
+   ```
+   
  - Configure globals
  - Add ssh key to root user within deployer container and set perms
+ - Use Ansible to copy ubuntu user's ssh authorized_key over root's
+   
+   ```
+   ansible cp .ssh/authorized_keys /root/.ssh/authorized_keys
+   ```
+
  - Run kolla-ansible prechecks
  - Run kolla-ansible deploy
