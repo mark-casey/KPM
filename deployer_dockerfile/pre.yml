@@ -4,10 +4,17 @@
 
 - name: Install and configure software on target hosts
   hosts: all
+  vars:
+    - ext_vlans:
+        - 251
+        - 252
+        - 253
+        - 254
+
   tasks:
     - name: Install some python stuff
       shell: >
-             apt-get -qy update && apt-get -qy install curl git vim python-pip python-docker
+             apt-get -qy update && apt-get -qy install curl git vim python-pip python-docker vlan
 
     #- name: Install docker
     #  shell: >
@@ -22,9 +29,34 @@
         dest: "/lib/systemd/system/docker.service.d/kolla.conf"
       register: file_create
 
+    - name: Symlink /etc/systemd/system/docker.service to make Kolla prechecks happy
+      shell: ln -sf /lib/systemd/system/docker.service.d/kolla.conf /etc/systemd/system/docker.service
+      when: file_create|changed
+
     - name: Restart docker
       shell: systemctl daemon-reload && service docker restart
+      when: file_create|changed
 
     - name: Upgrade docker-py
       command: pip install -U docker-py
       when: file_create|changed
+
+    - name: Checking if '8021q' in /etc/modules
+      command: cat /etc/modules
+      changed_when: false
+      register: result
+
+    - name: Enable 8021q kernel module for vlan
+      shell: modprobe 8021q && echo '8021q' >> /etc/modules
+      when: result.stdout.find('8021q') == -1
+
+    - name: Checking if vlans present for external networks
+      command: ip a
+      register: result
+      changed_when: false
+
+    - name: Add any missing external network vlans
+      command: vconfig add eth1 {{ item }}
+      with_items: ext_vlans
+      when: result.stdout.find('eth1.{{ item }}') == -1
+
