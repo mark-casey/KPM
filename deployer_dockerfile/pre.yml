@@ -18,15 +18,13 @@
 
     - name: Create /lib/systemd/system/docker.service.d/kolla.conf
       copy:
-        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','DPLYR_MGMTNET_IP') }}:5000\nMountFlags=\nMountFlags=shared"
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','DPLYR_MGMTNET_IP') }}:5000\nMountFlags=\nMountFlags=shared\n"
         dest: "/lib/systemd/system/docker.service.d/kolla.conf"
       register: file_create
 
     - name: Restart docker
-      command: systemctl daemon-reload && service docker restart
-      when: file_create|changed
+      shell: systemctl daemon-reload && service docker restart
 
     - name: Upgrade docker-py
       command: pip install -U docker-py
       when: file_create|changed
-
