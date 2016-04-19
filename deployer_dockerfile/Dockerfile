@@ -18,7 +18,7 @@ RUN chmod 755 /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inve
 # temporary unholy Bash hax to get MAAS's randomized hostnames into deployer container's /etc/hosts
 # will make a little cleaner later
 RUN dynamic_inven_hostnames_and_ips() { /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py --nodes | grep -E "hostname|ip_address\".+[0-9]{3}[\", ]+$" | sed "N;s/\n//"; } && \
-    IFS=$'\n\b'; for hosts_entry in $(dynamic_inven_hostnames_and_ips); do echo "${hosts_entry}" | sed -e 's/hostname":\|ip_address\|[", ]//g' -e 's/:/\t/' | tee -a /etc/hosts; done; unset IFS
+    IFS=$'\n\b'; for hosts_entry in $(dynamic_inven_hostnames_and_ips); do echo "${hosts_entry}" | sed -e 's/hostname":\|ip_address\|[", ]//g' -e 's/:/\t/' >> /etc/hosts; done; unset IFS
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
