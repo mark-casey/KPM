@@ -1,0 +1,32 @@
+---
+
+# this playbook is so hacky it's practically a bash script. will fix - just want to see it work atm
+
+- name: Install and configure software on target hosts
+  hosts: all
+  tasks:
+    - name: Install some python stuff
+      shell: >
+             apt-get -qy update && apt-get -qy install curl git vim python-pip python-docker
+
+    #- name: Install docker
+    #  shell: >
+    #         curl -sSL https://get.docker.io | bash
+
+    - name: Create docker.service.d
+      file: path='/lib/systemd/system/docker.service.d' state=directory
+      register: dir_create
+
+   - name: Create /lib/systemd/system/docker.service.d/kolla.conf
+     shell: >
+            echo -e "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','SUDO_USER') }}:5000\nMountFlags=\nMountFlags=shared" > /lib/systemd/system/docker.service.d/kolla.conf
+     when: dir_create|changed
+
+   - name: Restart docker
+     command: systemctl daemon-reload && service docker restart
+     when: dir_create|changed
+
+   - name: Upgrade docker-py
+     command: pip install -U docker-py
+     when: dir_create|changed
+
