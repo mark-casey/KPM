@@ -17,16 +17,16 @@
       file: path='/lib/systemd/system/docker.service.d' state=directory
       register: dir_create
 
-   - name: Create /lib/systemd/system/docker.service.d/kolla.conf
-     shell: >
-            echo -e "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','SUDO_USER') }}:5000\nMountFlags=\nMountFlags=shared" > /lib/systemd/system/docker.service.d/kolla.conf
-     when: dir_create|changed
+    - name: Create /lib/systemd/system/docker.service.d/kolla.conf
+      shell: >
+             echo -e "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','SUDO_USER') }}:5000\nMountFlags=\nMountFlags=shared" > /lib/systemd/system/docker.service.d/kolla.conf
+      when: dir_create|changed
 
-   - name: Restart docker
-     command: systemctl daemon-reload && service docker restart
-     when: dir_create|changed
+    - name: Restart docker
+      command: systemctl daemon-reload && service docker restart
+      when: dir_create|changed
 
-   - name: Upgrade docker-py
-     command: pip install -U docker-py
-     when: dir_create|changed
+    - name: Upgrade docker-py
+      command: pip install -U docker-py
+      when: dir_create|changed
 
