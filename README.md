@@ -146,7 +146,7 @@ exit #(from 'vagrant ssh maas')
    mkdir .ssh
    vim .ssh/id_rsa  # paste private key in
    chmod 600 .ssh/id_rsa
-   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -m shell -a 'cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
+   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -u ubuntu -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible precheck --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
    
