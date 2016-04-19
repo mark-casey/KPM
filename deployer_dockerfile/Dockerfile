@@ -19,4 +19,4 @@ ADD .bash_profile /root
 
 
 ENTRYPOINT ["/bin/sh", "-c"]
-CMD ["bash"]
+CMD ["bash -l"]
