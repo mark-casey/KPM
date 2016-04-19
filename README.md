@@ -80,12 +80,6 @@ git clone https://github.com/ropsoft/kolla_from_vagrant.git
 cd kolla_from_vagrant
 
 vagrant up maas --provider=virtualbox
-vagrant up kd_reg --provider=docker
-vagrant up deployer --provider=docker
-
-# you can run this command in another terminal to save some time
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7 "kolla-build --base ubuntu --type source --registry ${DPLYR_MGMTNET_IP}:5000 --push"
-
 vagrant ssh maas
 
 # workaround for partitioning bug MAAS runs into on NVMe SSDs (https://bugs.launchpad.net/curtin/+bug/1401190)
@@ -131,24 +125,44 @@ exit #(from 'vagrant ssh maas')
 
 
 # Deploy
- - # docker run -it da8fdca3cea7
+ 
+ - Run these to bring up containers for docker private reg and deployer
+   
+   ```
+   vagrant up kd_reg --provider=docker
+   vagrant up deployer --provider=docker
+   # note image ID of built container and use on next line
+   docker run -it -e "DPLYR_MGMTNET_IP=${DPLYR_MGMTNET_IP}" -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7
+   ```
+   
+ - Run inside deployer after ^^^
    
    ```
    cd
    kolla-genpwd
+   kolla-build --base ubuntu --type source --registry "${DPLYR_MGMTNET_IP}":5000 --push
    sed -i -e 's/^#*kolla_base_distro:.*/kolla_base_distro: "ubuntu"/' -e 's/^#*kolla_install_type:.*/kolla_install_type: "source"/' -e 's/^#*kolla_internal_vip_address:.*/kolla_internal_vip_address: "10.101.0.215"/' -e 's/^#*docker_registry:.*/docker_registry: "10.101.0.15:5000"/' /etc/kolla/globals.yml
    mkdir .ssh
-   vim .ssh/id_rsa
+   vim .ssh/id_rsa  # paste private key in
    chmod 600 .ssh/id_rsa
-   ```
+   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -m shell -a 'cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
+   ANSIBLE_SSH_PIPELINING=1 kolla-ansible precheck --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
+   ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
    
- - Configure globals
- - Add ssh key to root user within deployer container and set perms
- - Use Ansible to copy ubuntu user's ssh authorized_key over root's
+   # if failures:
+   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -m script -a '/kolla/tools/cleanup-containers' all
+   
+   # goto prechecks ^^^
    
    ```
-   ansible cp .ssh/authorized_keys /root/.ssh/authorized_keys
-   ```
+
 
  - Run kolla-ansible prechecks
  - Run kolla-ansible deploy
+ 
+on deployer container post-deploy:
+
+source /etc/kolla/admin-openrc.sh
+
+pip install -U python-openstackclient python-neutronclient python-novaclient
+
