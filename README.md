@@ -146,21 +146,18 @@ exit #(from 'vagrant ssh maas')
    vim .ssh/id_rsa  # paste private key in
    chmod 600 .ssh/id_rsa
    ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -u ubuntu -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
-   ANSIBLE_SSH_PIPELINING=1 ansible-playbook -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py pre.yml
-   ANSIBLE_SSH_PIPELINING=1 kolla-ansible prechecks --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
-   ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
+   ANSIBLE_SSH_PIPELINING=1 ansible-playbook -i /usr/local/share/kolla/ansible/inventory/ pre.yml
+   ANSIBLE_SSH_PIPELINING=1 kolla-ansible prechecks --inventory /usr/local/share/kolla/ansible/inventory/
+   ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/
    
    # if failures:
-   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -m script -a '/kolla/tools/cleanup-containers' all
+   ansible -i /usr/local/share/kolla/ansible/inventory/ -m script -a '/kolla/tools/cleanup-containers' all
    
    # goto prechecks ^^^
    
    ```
 
 
- - Run kolla-ansible prechecks
- - Run kolla-ansible deploy
- 
 on deployer container post-deploy:
 
 source /etc/kolla/admin-openrc.sh
