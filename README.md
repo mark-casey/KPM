@@ -149,18 +149,15 @@ exit #(from 'vagrant ssh maas')
    ANSIBLE_SSH_PIPELINING=1 ansible-playbook -i /usr/local/share/kolla/ansible/inventory/ pre.yml
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible prechecks --inventory /usr/local/share/kolla/ansible/inventory/
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/
-   
+   ANSIBLE_SSH_PIPELINING=1 kolla-ansible post-deploy --inventory /usr/local/share/kolla/ansible/inventory/
+   source /etc/kolla/admin-openrc.sh
+   # installing stuff like this and docker-py on ubuntu seems to break pip so I defer it to last
+   pip install -U python-openstackclient python-neutronclient python-novaclient
+
    # if failures:
    ansible -i /usr/local/share/kolla/ansible/inventory/ -m script -a '/kolla/tools/cleanup-containers' all
    
    # goto prechecks ^^^
    
    ```
-
-
-on deployer container post-deploy:
-
-source /etc/kolla/admin-openrc.sh
-
-pip install -U python-openstackclient python-neutronclient python-novaclient
 
