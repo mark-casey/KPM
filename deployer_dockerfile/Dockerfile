@@ -5,7 +5,7 @@ RUN apt-get -q -y update && \
     curl -sSL https://get.docker.io | bash && \
     pip install -U ansible==1.9.4 oauth && \
     #pip install -U ansible==1.9.4 oauth docker-py && \
-    git clone https://git.openstack.org/openstack/kolla && \
+    git clone --branch stable/mitaka https://git.openstack.org/openstack/kolla && \
     pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/ && \
     kolla-genpwd && \
