@@ -8,7 +8,7 @@ RUN apt-get -q -y update && \
     git clone --branch stable/mitaka https://git.openstack.org/openstack/kolla && \
     #pip install kolla/ && \
     cp -r kolla/etc/kolla /etc/ && \
-    kolla-genpwd && \
+    #kolla-genpwd && \
     # remove hosts (control01, network02, etc.) since we're using dynamic inventory... but preserve groups
     grep -v 'control[^] -]\|network[^] -]\|compute[^] -]\|storage[^] -]' /usr/local/share/kolla/ansible/inventory/multinode > /usr/local/share/kolla/ansible/inventory/kolla_groups && \
     rm /usr/local/share/kolla/ansible/inventory/all-in-one && \
