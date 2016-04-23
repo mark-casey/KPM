@@ -56,7 +56,7 @@ Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
     config.vm.define "maas", primary: false do |maas|
-        maas.vm.box = "ubuntu/wily64"
+        maas.vm.box = "ubuntu/xenial64"
         maas.vm.hostname = "maas"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
         maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
