@@ -87,7 +87,8 @@ Vagrant.configure(2) do |config|
             MAAS_ADMIN_PASS=#{maas_admin_pass}
             MAAS_ADD_COREOS="yes"
             
-            wget -o- https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash | bash
+            wget -O- https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash
+            chmod 755 setup.bash
             
         SHELL
     end
