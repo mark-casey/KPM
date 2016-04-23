@@ -78,14 +78,14 @@ Vagrant.configure(2) do |config|
 
         maas.vm.provision "shell", inline: <<-SHELL
             # set up env (FIXME: need to see if we can get rid of the intermediate ruby var step or otherwise simplify)
-            MAASVM_IPMINET_IP=#{maasvm_ipminet_ip}
-            MAASVM_MGMTNET_IP=#{maasvm_mgmtnet_ip}
-            MAASVM_DEFAULTGW_IP=#{maasvm_defaultgw_ip}
-            MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}:5240/MAAS/api/1.0"
-            MAAS_ADMIN_USER=#{maas_admin_user}
-            MAAS_ADMIN_EMAIL=#{maas_admin_email}
-            MAAS_ADMIN_PASS=#{maas_admin_pass}
-            MAAS_ADD_COREOS="yes"
+            export MAASVM_IPMINET_IP=#{maasvm_ipminet_ip}
+            export MAASVM_MGMTNET_IP=#{maasvm_mgmtnet_ip}
+            export MAASVM_DEFAULTGW_IP=#{maasvm_defaultgw_ip}
+            export MAASVM_API_URL="http://#{maasvm_mgmtnet_ip}:5240/MAAS/api/1.0"
+            export MAAS_ADMIN_USER=#{maas_admin_user}
+            export MAAS_ADMIN_EMAIL=#{maas_admin_email}
+            export MAAS_ADMIN_PASS=#{maas_admin_pass}
+            export MAAS_ADD_COREOS="yes"
             
             wget -O- https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash | bash
 
