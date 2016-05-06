@@ -1,6 +1,6 @@
 ## Production Kolla deployment to bare metal hosts, PXE-booted via MAAS
 ---
-Supporting infratructure (Kolla deployer host, MAAS, private Docker registry, etc.) run inside Vagrant to streamline setup and maximize repeatability.
+Supporting infratructure (Kolla deploymentd host, MAAS, private Docker registry, etc.) run inside Vagrant to streamline setup and maximize repeatability.
 
 # Layout of the deployment host
 A single bare metal host (which will only run supporting infrastructure; not OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). For simplicity, this host will be referred to (adopting Kolla's chosen terminology) as the deployment host, though in reality it runs several Vagrant machines each containing a piece of supporting infrastructure (again: MAAS, private Docker registry, etc.).
@@ -123,7 +123,7 @@ exit #(from 'vagrant ssh maas')
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
-# Test dynamic inventory from within deployer container
+# Test dynamic inventory from within deployment container
 
 
 
