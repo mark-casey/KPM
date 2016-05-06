@@ -1,16 +1,17 @@
-## Production Kolla deployment to bare metal hosts, PXE-booted via MAAS
+## Production Kolla deployment to PXE-booted bare metal hosts
 ---
-Supporting infratructure (Kolla deploymentd host, MAAS, private Docker registry, etc.) run inside Vagrant to streamline setup and maximize repeatability.
 
-# Layout of the deployment host
-A single bare metal host (which will only run supporting infrastructure; not OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). For simplicity, this host will be referred to (adopting Kolla's chosen terminology) as the deployment host, though in reality it runs several Vagrant machines each containing a piece of supporting infrastructure (again: MAAS, private Docker registry, etc.).
+# Layout of supporting infrastructure
+Supporting infratructure (Kolla deployment host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant to streamline setup and maximize repeatability.
 
-These Vagrant machines are arranged as follows:
- - Running via Vagrant's virtualbox provider:
-     - PXE boot services and IPMI power management are handled by Canonical's MAAS
- - Running via Vagrant's docker provider:
+A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete (though preserving its data is highly recommended to facilitate using Kolla to run upgrades later).
+
+The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure (again: MAAS, private Docker registry, etc.). These Vagrant machines are arranged as follows:
+ - Running under Vagrant's virtualbox provider, as a virtual machine:
+     - PXE boot services and IPMI power management are handled by MAAS
+ - Running under Vagrant's docker provider, as containers:
      - Private Docker registry is run from Docker's registry:2 image
-     - Kolla's deployment/operator host is also built as a container. (Vagrant starts this container automatically [as that is just what it does when it finishes building from a Dockerfile], so we simply pass an overridden runtime command of 'exit'.)
+     - Kolla's deployment host is also built as a container. (Vagrant starts this container automatically [as that is just what it does when it finishes building from a Dockerfile], so we simply pass an overridden runtime command of 'exit'.)
 
 
 
