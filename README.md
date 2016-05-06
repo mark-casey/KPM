@@ -1,4 +1,4 @@
-## Production multi-node Kolla deployment to bare metal hosts, PXE-booted via MAAS
+## Production Kolla deployment to bare metal hosts, PXE-booted via MAAS
 ---
 Supporting infratructure (Kolla deployer host, MAAS, private Docker registry, etc.) run inside Vagrant to streamline setup and maximize repeatability.
 
