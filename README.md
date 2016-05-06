@@ -3,18 +3,18 @@
 ### Layout of supporting infrastructure
 Supporting infrastructure (Kolla deployment host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant. While this layout is not targeted specifically to test/dev environments, running these components within Vagrant streamlines setup and maximizes repeatability.
 
-![images/layout1.png]
+![layout1.png]
 
 A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete (though preserving its data is highly recommended to facilitate using Kolla to run upgrades later, since some things like MAAS's list of enrolled hosts are persistent).
 
-![images/layout2.png]
+![layout2.png]
 
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure. These Vagrant machines are arranged as follows:
  - Running under Vagrant's virtualbox provider, a virtual machine running MAAS to handle PXE-boot services and IPMI power management
  - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image
  - Also running under Vagrant's docker provider, a container that acts as Kolla's deployment host
 
-![images/layout3.png]
+![layout3.png]
 
 ### Physical network
 The vlan terminology used here is described in terms of "vlan is untagged for port" and/or "vlan is tagged for port(s)". This terminology is common on many vendor's hardware such as D-Link and Netgear, but has also been seen on some midrange Cisco Business switches. It is assumed that anyone using the (arguably more traditional) access/trunk terminology will translate this reference layout to their environment.
