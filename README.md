@@ -5,13 +5,13 @@ Supporting infrastructure (Kolla deployer host, Canonical's MAAS, private Docker
 
 ![](layout1.png)
 
-A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete (though preserving its data is highly recommended to facilitate using Kolla to run upgrades later, since some things like MAAS's list of enrolled hosts are persistent).
+A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete, but preserving its data is highly recommended to facilitate using Kolla to run upgrades later. Some things like MAAS's list of enrolled hosts are persistent and we pass this list as a dynamic inventory for Ansible to use when deploying OpenStack with Kolla.
 
 ![](layout2.png)
 
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure. These Vagrant machines are arranged as follows:
  - Running under Vagrant's virtualbox provider, a virtual machine running MAAS to handle PXE-boot services and IPMI power management
- - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image
+ - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image for Kolla to use
  - Also running under Vagrant's docker provider, a container that acts as Kolla's deployer host
 
 ![](layout3.png)
