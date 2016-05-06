@@ -21,7 +21,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 1. A vlan for management network
   - This network has Internet access behind a NAT router.
-  - Ansible's target addresses are in this network, and Kolla's management VIP is also chosen as an unused IP in this network (config option 'kolla_internal_vip_address').
+  - The IP addresses for the hosts in Ansible's inventory are in this network, and Kolla's management VIP is also chosen as an unused IP in this network (config option: 'kolla_internal_vip_address').
   - The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
 
 ![](layout4.png)
