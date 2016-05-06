@@ -1,8 +1,11 @@
-## "Semi-production" Kolla deploy
-with Kolla-specific infra run via Vagrant
+## Production multi-node Kolla deployment to bare metal hosts, PXE-booted via MAAS
+---
+Supporting infratructure (Kolla deployer host, MAAS, private Docker registry, etc.) run inside Vagrant to streamline setup and maximize repeatability.
 
-# Jobs/Tasks/Software/Deployment Host layout
-A single host (which will not run OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product). This document will refer to this host as Kolla's deployment (or operator) host, even though technically the normal jobs performed by that host (plus a few) are really running as Vagrant guests on the host. These are arranged as follows:
+# Layout of the deployment host
+A single bare metal host (which will only run supporting infrastructure; not OpenStack components) is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). For simplicity, this host will be referred to (adopting Kolla's chosen terminology) as the deployment host, though in reality it runs several Vagrant machines each containing a piece of supporting infrastructure (again: MAAS, private Docker registry, etc.).
+
+These Vagrant machines are arranged as follows:
  - Running via Vagrant's virtualbox provider:
      - PXE boot services and IPMI power management are handled by Canonical's MAAS
  - Running via Vagrant's docker provider:
