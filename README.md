@@ -1,4 +1,4 @@
-# Production Kolla deployment to PXE-booted bare metal hosts
+# Kolla deployment to PXE-booted bare metal hosts
 
 ### Layout of supporting infrastructure
 Supporting infratructure (Kolla deployment host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant to streamline setup and maximize repeatability.
