@@ -1,7 +1,7 @@
 # Kolla deployment to PXE-booted bare metal hosts
 
 ### Layout of supporting infrastructure
-Supporting infrastructure (Kolla deployment host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant. While this layout is not targeted specifically to test/dev environments, running these components within Vagrant streamlines setup and maximizes repeatability.
+Supporting infrastructure (Kolla deployer host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant. While this layout is not targeted specifically to test/dev environments, running these components within Vagrant streamlines setup and maximizes repeatability.
 
 ![](layout1.png)
 
@@ -12,7 +12,7 @@ A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or si
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure. These Vagrant machines are arranged as follows:
  - Running under Vagrant's virtualbox provider, a virtual machine running MAAS to handle PXE-boot services and IPMI power management
  - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image
- - Also running under Vagrant's docker provider, a container that acts as Kolla's deployment host
+ - Also running under Vagrant's docker provider, a container that acts as Kolla's deployer host
 
 ![](layout3.png)
 
