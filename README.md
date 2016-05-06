@@ -6,11 +6,9 @@ Supporting infrastructure (Kolla deployment host, Canonical's MAAS, private Dock
 A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete (though preserving its data is highly recommended to facilitate using Kolla to run upgrades later).
 
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure (again: MAAS, private Docker registry, etc.). These Vagrant machines are arranged as follows:
- - Running under Vagrant's virtualbox provider, as a virtual machine:
-     - PXE boot services and IPMI power management are handled by MAAS
- - Running under Vagrant's docker provider, as containers:
-     - Private Docker registry is run from Docker's registry:2 image
-     - Kolla's deployment host is also built as a container. (Vagrant starts this container automatically [as that is just what it does when it finishes building from a Dockerfile], so we simply pass an overridden runtime command of 'exit'.)
+ - Running under Vagrant's virtualbox provider, a virtual machine running MAAS to handle PXE-boot services and IPMI power management
+ - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image
+ - Also running under Vagrant's docker provider, a container that acts as Kolla's deployment host
 
 
 
@@ -116,7 +114,7 @@ exit #(from 'vagrant ssh maas')
  - Configure BIOS of all target hosts to boot from the hard disk MAAS will install to, then shut them back down.
  - Add public SSH key to the admin user (or the MAAS user you will be logged in as when deploying) in MAAS interface
  - Enable DHCP and DNS from MAAS on the mgmt interface
- - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE boot on each target host without making permanent changes to the boot order.
+ - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order.
  - In the MAAS interface, you will "Commission", "Acquire", and then "Deploy" the hosts.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
