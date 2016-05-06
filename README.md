@@ -16,7 +16,7 @@ The SI host runs several Vagrant machines, each containing a piece of supporting
 
 ![](layout3.png)
 
-### Physical network
+### Layout of the physical network
 The vlan terminology used here is described in terms of "vlan is untagged for port" and/or "vlan is tagged for port(s)". This terminology is common on many vendor's hardware such as D-Link and Netgear, but has also been seen on some midrange Cisco Business switches. It is assumed that anyone using the (arguably more traditional) access/trunk terminology will translate this reference layout to their environment.
 
 1. A vlan for management network
