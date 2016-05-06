@@ -20,15 +20,24 @@ The SI host runs several Vagrant machines, each containing a piece of supporting
 The vlan terminology used here is described in terms of "vlan is untagged for port" and/or "vlan is tagged for port(s)". This terminology is common on many vendor's hardware such as D-Link and Netgear, but has also been seen on some midrange Cisco Business switches. It is assumed that anyone using the (arguably more traditional) access/trunk terminology will translate this reference layout to their environment.
 
 1. A vlan for management network
-  - This network has Internet access behind a NAT router
-  - Ansible's target addresses are in this network, and Kolla's management VIP is also chosen as an unused IP in this network
+  - This network has Internet access behind a NAT router.
+  - Ansible's target addresses are in this network, and Kolla's management VIP is also chosen as an unused IP in this network (config option 'kolla_internal_vip_address').
   - The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
+
+![](layout4.png)
 
 2. A vlan for IPMI network.
   - If your hosts have dedicated IPMI NICs, the ports they plug into are untagged on the switch for this network.
+  - If your hosts have shared IPMI NICs, the ports they plug into are untagged for the NIC's primary function and the 
   - Other ports are set as tagged for this network as-needed (such as the uplink to the NAT router).
   - DHCP for the IPMI network is provided by the NAT router (the existing test setup runs the DHCP server on a vlan interface added to the router for this network, so you may need more than a SOHO router to do this - Mikrotik RB450G in use here.)
 
+![](layout5.png)
+
+3. External/provider network access
+  - At least one NIC on each host is configured to be used for external/provider network access (config option: 'kolla_external_vip_interface').
+
+![](layout6.png)
 
 ### Installation
 
