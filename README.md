@@ -1,7 +1,7 @@
-# Production Kolla deployment to PXE-booted bare metal hosts
----
+## Production Kolla deployment to PXE-booted bare metal hosts
 
-## Layout of supporting infrastructure
+
+### Layout of supporting infrastructure
 Supporting infratructure (Kolla deployment host, Canonical's MAAS, private Docker registry, etc.) are run inside Vagrant to streamline setup and maximize repeatability.
 
 A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete (though preserving its data is highly recommended to facilitate using Kolla to run upgrades later).
@@ -15,7 +15,7 @@ The SI host runs several Vagrant machines, each containing a piece of supporting
 
 
 
-## Physical network
+### Physical network
 
 vlans described here are on a d-link switch, which people have described as conceptually odd or backwards in their configuration (though they are still generally interoperable with gear from other brands)
 
@@ -30,7 +30,7 @@ vlans described here are on a d-link switch, which people have described as conc
   - DHCP for the IPMI network is provided by the NAT router (the existing test setup runs the DHCP server on a vlan interface added to the router for this network, so you may need more than a SOHO router to do this - Mikrotik RB450G in use here.)
 
 
-## Installation
+### Installation
 
  - Install an SSH server on the deployment host then in an SSH terminal to it...
 
@@ -112,7 +112,7 @@ EOF
 exit #(from 'vagrant ssh maas')
 ```
 
-## Install OSes with MAAS
+### Install OSes with MAAS
 
  - Configure BIOS of all target hosts to boot from the hard disk MAAS will install to, then shut them back down.
  - Add public SSH key to the admin user (or the MAAS user you will be logged in as when deploying) in MAAS interface
@@ -124,11 +124,11 @@ exit #(from 'vagrant ssh maas')
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
-## Test dynamic inventory from within deployment container
+### Test dynamic inventory from within deployment container
 
 
 
-## Deploy
+### Deploy
  
  - Run these to bring up containers for docker private reg and deployer
    
