@@ -22,7 +22,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 1. A vlan for management network
   - This network has Internet access behind a NAT router.
   - The IP addresses for the hosts in Ansible's inventory are in this network, and Kolla's management VIP is also chosen as an unused IP in this network (config option: 'kolla_internal_vip_address').
-  - The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS guest itself) are statically assigned.
+  - The MAAS Vagrant guest handles DHCP on this network. Hardware that needs an IP prior to the MAAS guest coming up (this far: the router, the switch, the physical deployment host, the MAAS VM itself) are statically assigned.
 
 ![](layout4.png)
 
@@ -41,15 +41,19 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 ### Installation
 
- - Install an SSH server on the deployment host then in an SSH terminal to it...
+ - Install an OS on the SI host. Ubuntu 15.10 Wily x64 used for creating this document.
+   - You should have one NIC connected to the IPMI network with a DHCP address.
+   - You should have one NIC connected to the management network with a static IP address, as mentioned above. 10.101.10.15 was used when creating this document, with the NAT router located at 10.101.10.1.
+
+ - Install an SSH server on the SI host, then SSH to it over the management network.
 
  - Override any of the optional vars that you do not want to use defaults for
 
     ```
-    export DPLYR_MGMTNET_IP='10.101.10.15'
-    export MAASVM_IPMINET_IP='10.100.10.16'
-    export MAASVM_MGMTNET_IP='10.101.10.16'
-    #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if unset
+    export DPLYR_MGMTNET_IP='10.101.10.15'  # the SI host
+    export MAASVM_IPMINET_IP='10.100.10.16'  # the MAAS VM's IP on the IPMI network
+    export MAASVM_MGMTNET_IP='10.101.10.16'  # the MAAS VM's IP on the management network
+    #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if not defined
     #export MAAS_ADMIN_USER='admin'
     #export MAAS_ADMIN_EMAIL='admin@example.com'
     #export MAAS_ADMIN_PASS='admin'
@@ -58,21 +62,30 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
  - Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
 
     ```
+    # tools
     sudo apt-get -qy update
     sudo apt-get -qy install curl git vim
     
+    # install appropriate Vagrant
     wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
     sudo dpkg -i vagrant_1.8.1_x86_64.deb
     
+    # install appropriate VirtualBox
     wget http://download.virtualbox.org/virtualbox/5.0.14/virtualbox-5.0_5.0.14-105127~Ubuntu~wily_amd64.deb
     sudo dpkg -i virtualbox-5.0_5.0.14-105127~Ubuntu~wily_amd64.deb
     
+    # fix missing deb package depends not included in the above 'dpkg -i' commands
     sudo apt-get install -f
     
+    # DO NOT DO THIS IN PRODUCTION UNLESS YOU WANT TO LOSE DATA ON THE SI HOST WHEN THERE IS A POWER OUTAGE
+    # ...but it does make Kolla build images and deploy faster.
     sudo mount / -o remount,nobarrier,noatime,nodiratime
     
+    # run Docker's installer
     sudo su root -c "curl -sSL https://get.docker.io | bash"
-    sudo usermod -aG docker user
+    #sudo usermod -aG docker USER_CHOSEN_AT_OS_INSTALL_GOES_HERE
+    
+    # add shared MountFlag to Docker daemon... this is the process for Ubuntu Wily 15.10... which uses systemd same as CentOS
     sudo mkdir -p /lib/systemd/system/docker.service.d
     sudo tee /lib/systemd/system/docker.service.d/kolla.conf <<-EOF
     [Service]
