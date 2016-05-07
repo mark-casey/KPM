@@ -104,7 +104,7 @@
       set_fact: my_build_py_images=kolla_image_count / {{ all|length }}
 
     - name: Register image list to build per host
-      shell: build.py --options --options INVALID_REGEX | one-liner to get just image list | cut -d, -f $USE_NUMBERS_ABOVE_TO__SPLIT_INTO_RANGES
+      shell: build.py --options --options INVALID_REGEX | one-liner to get just image list | cut -d, -f $USE_NUMBERS_ABOVE_TO__SPLIT_INTO_RANGES along with {{ groups.somegroup.index(inventory_hostname) }}
       register: result
 
       # Tasks below skip if this is over 25
