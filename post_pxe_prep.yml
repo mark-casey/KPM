@@ -1,0 +1,94 @@
+---
+
+- name: Install and configure software on target hosts
+  hosts: all
+  vars:
+    - ext_vlans:
+        - 251
+        - 252
+        - 253
+        - 254
+
+  tasks:
+    - name: Install some dependencies
+      command: >
+             apt-get -qy update && apt-get -qy install curl git vim vlan
+
+    - name: Remove old included pip
+      command: >
+             apt-get -qy purge python-pip
+
+    - name: Install new shiny pip
+      shell: >
+             curl https://bootstrap.pypa.io/get-pip.py | sudo python
+
+    - name: Install python-docker via pip
+      command: >
+             pip install -U python-docker
+
+    - name: Checking if Docker is installed
+      command: which docker
+      changed_when: false
+      register: result
+
+    - name: Install docker
+      shell: >
+             curl -sSL https://get.docker.io | bash
+      when: result.rc != 0
+
+      # This and next task assume CentOS or Ubuntu Wily or later... because systemd!
+    - name: Create docker.service.d
+      file: path='/lib/systemd/system/docker.service.d' state=directory
+
+    - name: Create /lib/systemd/system/docker.service.d/kolla.conf
+      copy:
+        content: "[Service]\nExecStart=\nExecStart=/usr/bin/docker daemon -H fd:// --insecure-registry {{ lookup('env','DPLYR_MGMTNET_IP') }}:5000\nMountFlags=\nMountFlags=shared\n"
+        dest: "/lib/systemd/system/docker.service.d/kolla.conf"
+      register: file_create
+
+    - name: Restart docker
+      shell: systemctl daemon-reload && service docker restart
+      when: file_create|changed
+
+      #
+      # Next several tasks are for setting up vlan interfaces to pass them along as regular interfaces to Neutron
+      # until they can be moved into ml2_conf.ini so that Neutron can handle them
+      #
+
+      # Not sure if Neutron depends on this module when handling vlans in the ml2_conf.ini, but I'm not handling them there - YET
+    - name: Checking if '8021q' in /etc/modules
+      command: cat /etc/modules
+      changed_when: false
+      register: result
+
+      # See comment on previous task
+    - name: Enable 8021q kernel module for vlan
+      shell: modprobe 8021q && echo '8021q' >> /etc/modules
+      when: result.stdout.find('8021q') == -1
+
+      # This and next task go away when moving vlans to ml2_config.ini
+    - name: Checking if vlans present for external networks
+      command: ip a
+      register: result
+      changed_when: false
+
+    - name: Add any missing external network vlans
+      command: vconfig add eth1 {{ item }}
+      with_items: ext_vlans
+      when: result.stdout.find('eth1.{{ item }}') == -1
+
+      #
+      # End vlan hackage
+      #
+      
+    - name: simulate long running op (15 sec), wait for up to 45 sec, poll every 5 sec
+      command: /bin/sleep 15 && 
+      async: 600
+      poll: 3
+      when: inventory_hostname == all[0]
+
+    - name: simulate long running op (15 sec), wait for up to 45 sec, poll every 5 sec
+      command: /bin/sleep 15
+      async: 600
+      poll: 3
+      when: inventory_hostname != all[0]
