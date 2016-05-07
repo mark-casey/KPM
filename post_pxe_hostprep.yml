@@ -24,7 +24,7 @@
 
     - name: Install python-docker via pip
       command: >
-             pip install -U python-docker
+             pip install -U docker-py
 
     - name: Checking if Docker is installed
       command: which docker
