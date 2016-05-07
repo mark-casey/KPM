@@ -80,15 +80,47 @@
       #
       # End vlan hackage
       #
-      
-    - name: simulate long running op (15 sec), wait for up to 45 sec, poll every 5 sec
-      command: /bin/sleep 15 && 
-      async: 600
-      poll: 3
-      when: inventory_hostname == all[0]
 
-    - name: simulate long running op (15 sec), wait for up to 45 sec, poll every 5 sec
-      command: /bin/sleep 15
+
+
+      #
+      # This section sees if Kolla image building has happened previously then:
+      #  - If no, it distributes the build to all nodes.
+      #  - If yes, it does nothing (I believe re-running build can get into questions of --no-cache so we avoid for now!).
+      #  - There is no support with this method of only building specific images... all are attempted!
+      #  - build.py does a pull first when considering building parent images and child images will build parent
+      #    images as a dependency so it doesn't matter which node gets which images to build. Later this should be
+      #    changed to make two passes. One to split up all parent builds, and another run for child builds
+      #
+
+    - name: List images
+      shell: build.py --options --options INVALID_REGEX | one-liner to get just images
+      register: result
+      
+    - name: Set a fact for how many images there are
+      set_fact: kolla_image_count=result|length()
+
+    - name: Set a fact for how many image subsets we should have
+      set_fact: my_build_py_images=kolla_image_count / {{ all|length }}
+
+    - name: Register image list to build per host
+      shell: build.py --options --options INVALID_REGEX | one-liner to get just image list | cut -d, -f $USE_NUMBERS_ABOVE_TO__SPLIT_INTO_RANGES
+      register: result
+
+      # Tasks below skip if this is over 25
+    - name: Count how many images we have to see if Kolla image build has happened in the past
+      shell: docker images | grep kollaglue | wc -l
+      register: result
+
+    - name: If this is the first node begin Kolla image build immediately (to get parent images built)
+      command: build.py --options --options {{ result.stdout }} 
+      async: 600  # 10 minutes to build images
+      poll: 5  # see if completed every 5 seconds
+      when: inventory_hostname == all[0] and result.stdout < 25
+
+    - name: If this is not the first node wait 30 seconds (to wait for parent images to build), then begin Kolla image build
+      command: /bin/sleep 30 && build.py --options --options {{ result.stdout }} 
       async: 600
-      poll: 3
-      when: inventory_hostname != all[0]
+      poll: 5
+      when: inventory_hostname != all[0] result.stdout < 25
+
