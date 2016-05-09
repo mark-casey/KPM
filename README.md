@@ -102,7 +102,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 (REMEMBER TO REDEFINE ANY ENV VARS FROM ABOVE THAT ARE LOST AT LOGOUT)
 
 ```
-git clone https://github.com/ropsoft/kolla_from_vagrant.git
+git clone https://github.com/ropsoft/KPM.git
 cd kolla_from_vagrant
 
 vagrant up maas --provider=virtualbox
