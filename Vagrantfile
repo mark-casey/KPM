@@ -88,7 +88,7 @@ Vagrant.configure(2) do |config|
             export MAAS_ADD_COREOS="yes"
             
             wget https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash
-            sleep 45
+            wait $(pgrep dpkg)
             bash setup.bash
             rm setup.bash
 
