@@ -87,7 +87,9 @@ Vagrant.configure(2) do |config|
             export MAAS_ADMIN_PASS=#{maas_admin_pass}
             export MAAS_ADD_COREOS="yes"
             
-            wget https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash && bash setup.bash
+            wget https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash
+            sleep 45
+            bash setup.bash
             rm setup.bash
 
             export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
