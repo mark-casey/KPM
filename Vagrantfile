@@ -56,7 +56,7 @@ Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
     config.vm.define "maas", primary: false do |maas|
-        maas.vm.box = "ubuntu/wily64"
+        maas.vm.box = "geerlingguy/ubuntu1604"
         maas.vm.hostname = "maas"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
         maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
@@ -88,11 +88,12 @@ Vagrant.configure(2) do |config|
             export MAAS_ADD_COREOS="yes"
             
             wget https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash
+            sleep 100
             wait $(pgrep dpkg)
             bash setup.bash
             rm setup.bash
 
-            export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
+            export MAAS_ADMIN_APIKEY="$(maas-region apikey --username ${MAAS_ADMIN_USER})"
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/kolla_deployer/ansible_maas_dynamic_inventory.py
             sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/kolla_deployer/ansible_maas_dynamic_inventory.py
         SHELL
