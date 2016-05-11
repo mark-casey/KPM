@@ -87,7 +87,8 @@ Vagrant.configure(2) do |config|
             export MAAS_ADMIN_PASS=#{maas_admin_pass}
             export MAAS_ADD_COREOS="yes"
             
-            wget -O- https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash | bash
+            wget https://raw.githubusercontent.com/ropsoft/mass_script/master/setup.bash && bash setup.bash
+            rm setup.bash
 
             export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/kolla_deployer/ansible_maas_dynamic_inventory.py
