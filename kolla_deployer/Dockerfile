@@ -1,7 +1,9 @@
 FROM ubuntu:wily
 
 RUN apt-get -q -y update && \
-    apt-get -q -y install curl python-pip python-dev gcc inetutils-ping ntp vim wget && \
+    apt-get -q-y purge python-pip && \
+    apt-get -q -y install curl python-dev gcc libffi-dev inetutils-ping ntp vim wget && \
+    curl https://bootstrap.pypa.io/get-pip.py | python && \
     curl -sSL https://get.docker.io | bash && \
     pip install -U ansible==1.9.4 oauth && \
     #pip install -U ansible==1.9.4 oauth docker-py && \
