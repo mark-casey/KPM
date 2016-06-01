@@ -103,7 +103,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 ```
 git clone https://github.com/ropsoft/KPM.git
-cd kolla_from_vagrant
+cd KPM
 
 vagrant up maas --provider=virtualbox
 vagrant ssh maas
