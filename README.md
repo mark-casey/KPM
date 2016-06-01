@@ -47,18 +47,6 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
  - Install an SSH server on the SI host, then SSH to it over the management network.
 
- - Override any of the optional vars that you do not want to use defaults for
-
-    ```
-    export DPLYR_MGMTNET_IP='10.101.10.15'  # the SI host
-    export MAASVM_IPMINET_IP='10.100.10.16'  # the MAAS VM's IP on the IPMI network
-    export MAASVM_MGMTNET_IP='10.101.10.16'  # the MAAS VM's IP on the management network
-    #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if not defined
-    #export MAAS_ADMIN_USER='admin'
-    #export MAAS_ADMIN_EMAIL='admin@example.com'
-    #export MAAS_ADMIN_PASS='admin'
-    ```
-
  - Install some overall dependencies, download and install platform-appropriate VBox and Vagrant, fix dependencies, then run Docker's install script
 
     ```
@@ -98,51 +86,40 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     sudo service docker restart
     ```
 
+ - Override any of the optional vars that you do not want to use defaults for
+
+    ```
+    export DPLYR_MGMTNET_IP='10.101.10.15'  # the SI host
+    export MAASVM_IPMINET_IP='10.100.10.16'  # the MAAS VM's IP on the IPMI network
+    export MAASVM_MGMTNET_IP='10.101.10.16'  # the MAAS VM's IP on the management network
+    #export MAASVM_DEFAULTGW_IP='10.101.10.3'  # assumes the '.1' of the management IP if not defined
+    #export MAAS_ADMIN_USER='admin'
+    #export MAAS_ADMIN_EMAIL='admin@example.com'
+    #export MAAS_ADMIN_PASS='admin'
+    ```
+
+
 (exit and reopen SSH terminal for docker group changes to take effect)
 (REMEMBER TO REDEFINE ANY ENV VARS FROM ABOVE THAT ARE LOST AT LOGOUT)
 
 ```
-git clone https://github.com/ropsoft/KPM.git
-cd KPM
-
+git clone https://github.com/ropsoft/KPM.git && cd KPM
 vagrant up maas --provider=virtualbox
-vagrant ssh maas
-
-# workaround for partitioning bug MAAS runs into on NVMe SSDs (https://bugs.launchpad.net/curtin/+bug/1401190)
-cat >> ~/b1401190.patch <<EOF
---- /usr/lib/python2.7/dist-packages/curtin/commands/block_meta.py      2016-04-05 23:02:13.158079435 +0000
-+++ /usr/lib/python2.7/dist-packages/curtin/commands/block_meta.py.mod  2016-04-05 23:23:13.642104142 +0000
-@@ -368,7 +368,12 @@
-         partnumber = determine_partition_number(vol.get('id'), storage_config)
-         disk_block_path = get_path_to_storage_volume(vol.get('device'),
-                                                      storage_config)
--        volume_path = disk_block_path + str(partnumber)
-+
-+        if disk_block_path == '/dev/nvme0n1':
-+            volume_path = disk_block_path + 'p' + str(partnumber)
-+        else:
-+            volume_path = disk_block_path + str(partnumber)
-+
-         devsync_vol = os.path.join(disk_block_path)
-
-     elif vol.get('type') == "disk":
-EOF
-
-# http://unix.stackexchange.com/questions/167216/how-can-i-apply-a-p0-patch-from-any-working-directory
-(cd / && sudo patch -p0) < b1401190.patch
-
-exit #(from 'vagrant ssh maas')
 ```
 
 ### Install OSes with MAAS
 
- - Configure BIOS of all target hosts to boot from the hard disk MAAS will install to, then shut them back down.
- - Add public SSH key to the admin user (or the MAAS user you will be logged in as when deploying) in MAAS interface
- - Enable DHCP and DNS from MAAS on the mgmt interface
+ - Configure the BIOS of all target hosts to boot from the hard disk the OS will be installed to, then shut the hosts down.
+ - Add public SSH key to the user you will be logged into MAAS as when deploying (presumably $MAAS_ADMIN_USER).
+     - Recent MAAS 2.0 beta releases seem to be missing the Add SSH Key button. See https://github.com/ropsoft/mass_script/blob/master/setup.bash for commands to recreate CLI login to MAAS, and then add key with:
+       ```maas "${MAAS_ADMIN_USER}" sshkeys create key="ssh-rsa AAAAB3N... your_key_comment"```
+ - Enable DHCP and DNS from MAAS on the mgmt interface:
+     - Recent MAAS 2.0 beta releases have this under "Take action" at the top left on the page found by clicking to config the VLAN assigned to the fabric of the desired interface/subnet.
  - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order.
  - In the MAAS interface, you will "Commission", "Acquire", and then "Deploy" the hosts.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
+   - If installing with coreos-install, follow those instructions then skip the Deploy stage below and continue with tagging hosts.
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
