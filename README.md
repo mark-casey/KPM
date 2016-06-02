@@ -5,14 +5,14 @@ Supporting infrastructure (Kolla deployer host, Canonical's MAAS, private Docker
 
 ![](layout1.png)
 
-A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (supporting infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete, but preserving its data is highly recommended to facilitate using Kolla to run upgrades later. Some things like MAAS's list of enrolled hosts are persistent and we pass this list as a dynamic inventory for Ansible to use when deploying OpenStack with Kolla.
+A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or similar virtualization product for which there is a Vagrant provider [VMware Workstation, libvirt, etc.]). This host will be referred to simply as the SI (Supporting Infrastructure) host. This is not a Kolla or OpenStack term, and is only used in this repo. No OpenStack services run on the SI host and it does not have to stay online once the deployment is complete, but preserving its data is highly recommended to facilitate using Kolla to run upgrades later. Some things like MAAS's list of enrolled hosts are persistent and we pass this list as a dynamic inventory for Ansible to use with Kolla.
 
 ![](layout2.png)
 
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure. These Vagrant machines are arranged as follows:
- - Running under Vagrant's virtualbox provider, a virtual machine running MAAS to handle PXE-boot services and IPMI power management
- - Running under Vagrant's docker provider, a container running Docker's registry:2 private registry image for Kolla to use
- - Also running under Vagrant's docker provider, a container that acts as Kolla's deployer host
+ - Running under Vagrant's virtualbox provider, a virtual machine (kpm-maas) running MAAS to handle PXE-boot services and IPMI power management
+ - Running under Vagrant's docker provider, a container (kpm-preg) running Docker's registry:2 private registry image for Kolla to use
+ - Also running under Vagrant's docker provider, a container (kpm-kolla) that acts as Kolla's deployer/operator host, and is where the command to build (build.py / kolla-build) container images for Kolla is run.
 
 ![](layout3.png)
 
@@ -39,11 +39,11 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 ![](layout6.png)
 
-### SI Host Initial Setup
+### SI Host Install
 
- - Install an OS on the SI host. Ubuntu 15.10 Wily x64 used for creating this document.
+ - Install an OS on the SI (Supporting Infrastructure) host. Ubuntu 15.10 Wily x64 used for creating this document.
    - You should have one NIC connected to the IPMI network with a DHCP address.
-   - You should have one NIC connected to the management network with a static IP address, as described above. (10.101.10.15 was used when creating this document, with the NAT router located at 10.101.10.1)
+   - You should have one NIC connected to the management network with a static IP address, as described above. (10.101.10.15 was used here, with the NAT router located at 10.101.10.1)
    - Install an SSH server on the SI host, then SSH to it on the management interface and continue with the following installs:  
         ```
         # tools
@@ -64,18 +64,21 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
         # fix missing deb package deps (if any) not included by 'dpkg -i'
         sudo apt-get install -f
         
-        # DO NOT DO THIS IN PRODUCTION UNLESS YOU WANT TO LOSE DATA ON THE SI HOST WHEN THERE IS A POWER OUTAGE
-        # ...but it does make Kolla build images and deploy faster.
+        # make Kolla build images and deploy faster
+        # DO NOT USE THIS (the nobarrier flag) IN PRODUCTION UNLESS YOU HAVE
+        # THE EQUIPMENT AND KNOW HOW TO MAKE IT "SAFE" (OR WANT TO LOSE
+        # DATA ON WHEN THERE IS A POWER OUTAGE)
         sudo mount / -o remount,nobarrier,noatime,nodiratime
         
         # run Docker's installer
         sudo su root -c "curl -sSL https://get.docker.io | bash"
-        #sudo usermod -aG docker USER_CHOSEN_AT_OS_INSTALL_GOES_HERE
         
-        ````
+        #sudo usermod -aG docker USER_CHOSEN_AT_OS_INSTALL_GOES_HERE
+        ```
 
- - Override any of the optional vars that you do not want to use defaults for
+ - Log out and log back in for docker group changes to take effect
 
+ - Set/override vars. These are primarily scoped to this repo and used in its Vagrantfile. They are used in configuring MAAS and $DPLYR_MGMTNET_IP, for example, is passed in to the kpm-kolla container and used as the docker registry push target when building container images with Kolla. While you may need to set these again for some things (perhaps you removed the kpm-kolla container and need to recreate it to rebuild container images and run a 'kolla-ansible upgrade'), these are NOT directly referenced in day-to-day cloud operation.  
     ```
     export DPLYR_MGMTNET_IP='10.101.10.15'  # the SI host
     export MAASVM_IPMINET_IP='10.100.10.16'  # the MAAS VM's IP on the IPMI network
@@ -86,23 +89,25 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     #export MAAS_ADMIN_PASS='admin'
     ```
 
- - 
+ - Check out KPM repo and bring up kpm-maas  
+    ```
+    git clone https://github.com/ropsoft/KPM.git && cd KPM
+    vagrant up maas --provider=virtualbox
+    ```
 
-```
-git clone https://github.com/ropsoft/KPM.git && cd KPM
-vagrant up maas --provider=virtualbox
-```
+### Finish configuring MAAS
 
-### Install OSes with MAAS
-
- - Configure the BIOS of all target hosts to boot from the hard disk the OS will be installed to, then shut the hosts down.
  - Add public SSH key to the user you will be logged into MAAS as when deploying (presumably $MAAS_ADMIN_USER).
      - Recent MAAS 2.0 beta releases seem to be missing the Add SSH Key button. See https://github.com/ropsoft/mass_script/blob/master/setup.bash for commands to recreate CLI login to MAAS, and then add key with:
        ```maas "${MAAS_ADMIN_USER}" sshkeys create key="ssh-rsa AAAAB3N... your_key_comment"```
  - Enable DHCP and DNS from MAAS on the mgmt interface:
      - Recent MAAS 2.0 beta releases have this under "Take action" at the top left on the page found by clicking to config the VLAN assigned to the fabric of the desired interface/subnet.
+
+### Install OSes with MAAS
+
+ - Configure the BIOS of all target hosts to boot from the hard disk the OS will be installed to, then shut the hosts down.
  - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order.
- - In the MAAS interface, you will "Commission", "Acquire", and then "Deploy" the hosts.
+ - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
    - If installing with coreos-install, follow those instructions then skip the Deploy stage below and continue with tagging hosts.
