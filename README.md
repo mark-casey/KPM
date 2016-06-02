@@ -89,16 +89,16 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     #export MAAS_ADMIN_PASS='admin'
     ```
 
- - Check out KPM repo and bring up kpm-maas  
+ - Check out repo and bring up kpm-maas  
     ```
     git clone https://github.com/ropsoft/KPM.git && cd KPM
-    vagrant up maas --provider=virtualbox
+    vagrant up kpm-maas --provider=virtualbox
     ```
 
 ### Finish configuring MAAS
 
  - Add public SSH key to the user you will be logged into MAAS as when deploying (presumably $MAAS_ADMIN_USER).
-     - Recent MAAS 2.0 beta releases seem to be missing the Add SSH Key button. See https://github.com/ropsoft/mass_script/blob/master/setup.bash for commands to recreate CLI login to MAAS, and then add key with:
+     - Recent MAAS 2.0 beta releases seem to be missing the Add SSH Key button in the web UI. See https://github.com/ropsoft/mass_script/blob/master/setup.bash for commands to recreate CLI login to MAAS, and then add key with:
        ```maas "${MAAS_ADMIN_USER}" sshkeys create key="ssh-rsa AAAAB3N... your_key_comment"```
  - Enable DHCP and DNS from MAAS on the mgmt interface:
      - Recent MAAS 2.0 beta releases have this under "Take action" at the top left on the page found by clicking to config the VLAN assigned to the fabric of the desired interface/subnet.
@@ -106,7 +106,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 ### Install OSes with MAAS
 
  - Configure the BIOS of all target hosts to boot from the hard disk the OS will be installed to, then shut the hosts down.
- - Start target hosts and choose the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order.
+ - Start target hosts and use the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order. If this is not an option you may have to set the boot order to network and then change it back to hard disk after the hosts are deployed. This is because some hosts will hang at grub when booting after deployment if they PXE boot and then get redirected to boot from disk.
  - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
@@ -123,8 +123,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
  - Run these to bring up containers for docker private reg and deployer
    
    ```
-   vagrant up kd_reg --provider=docker
-   vagrant up deployer --provider=docker
+   vagrant up kpm-preg --provider=docker
+   vagrant up kpm-kolla --provider=docker
    # note image ID of built container and use on next line
    docker run -it -e "DPLYR_MGMTNET_IP=${DPLYR_MGMTNET_IP}" -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7
    ```
@@ -140,7 +140,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
    mkdir .ssh
    vim .ssh/id_rsa  # paste private key in
    chmod 600 .ssh/id_rsa
-   ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -u ubuntu -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
+   #ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -u ubuntu -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
    ANSIBLE_SSH_PIPELINING=1 ansible-playbook -i /usr/local/share/kolla/ansible/inventory/ pre.yml
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible prechecks --inventory /usr/local/share/kolla/ansible/inventory/
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible deploy --inventory /usr/local/share/kolla/ansible/inventory/
