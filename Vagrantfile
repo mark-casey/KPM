@@ -55,15 +55,15 @@ end
 Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
-    config.vm.define "maas", primary: false do |maas|
+    config.vm.define "kpm-maaspxe", primary: false do |maas|
         maas.vm.box = "geerlingguy/ubuntu1604"
-        maas.vm.hostname = "maas"
+        maas.vm.hostname = "kpm-maaspxe"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
         maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         maas.vm.network :public_network, ip: maasvm_mgmtnet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
         #maas.vm.network :forwarded_port, guest: 22, host: 2961, id: "ssh"
         maas.vm.provider "virtualbox" do |vbox|
-            vbox.name = "maas"
+            vbox.name = "kpm-maaspxe"
             vbox.memory = "4096"
         end
 
@@ -99,7 +99,7 @@ Vagrant.configure(2) do |config|
     end
 
     # Private Docker registry Vagrant guest
-    config.vm.define "kd_reg", primary: false do |kd_reg|
+    config.vm.define "kpm-preg", primary: false do |kd_reg|
         kd_reg.vm.provider "docker" do |d1|
             d1.image = "registry:2"
             d1.name = "registry"
@@ -111,7 +111,7 @@ Vagrant.configure(2) do |config|
         #config.ssh.port = 22
     end
 
-    config.vm.define "deployer", primary: false do |deployer|
+    config.vm.define "kpm-kolla", primary: false do |deployer|
         deployer.vm.provider "docker" do |d2|
             d2.build_dir = "./kolla_deployer"
             d2.remains_running = false
