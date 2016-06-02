@@ -120,7 +120,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     ```
 
  - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
-   - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
+   - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page. You should select the option "Allow SSH access and prevent machine from powering off" when running the Commission process.
    - Acquire: Assign the target hosts to this MAAS user.
    - If installing with coreos-install, follow those instructions then skip the Deploy stage below and continue with tagging hosts.
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
