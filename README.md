@@ -48,7 +48,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
         ```
         # tools
         sudo apt-get -qy update
-        sudo apt-get -qy install curl git vim
+        sudo apt-get -qy install curl git ipmitool vim
         
         # install appropriate Vagrant
         wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
@@ -106,7 +106,19 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 ### Install OSes with MAAS
 
  - Configure the BIOS of all target hosts to boot from the hard disk the OS will be installed to, then shut the hosts down.
- - Start target hosts and use the "one time boot config/menu" (most hardware has this) to perform a PXE-boot on each target host without making permanent changes to the boot order. If this is not an option you may have to set the boot order to network and then change it back to hard disk after the hosts are deployed. This is because some hosts will hang at grub when booting after deployment if they PXE boot and then get redirected to boot from disk.
+ - Use ipmitool to set the hosts to boot one time from the network, then start/restart them. This example assumes 3 hosts and IPMI creditials of ADMIN/ADMIN, which you should substitute for your actual credentials (but note that MAAS will make its own IPMI account during the 'Commision' stage of adding the hosts to MAAS):  
+    ```
+    IPMI_USER='ADMIN'
+    IPMI_PASS='ADMIN'
+    ipmitool -H 10.100.10.95 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis bootdev pxe
+    ipmitool -H 10.100.10.96 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis bootdev pxe
+    ipmitool -H 10.100.10.97 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis bootdev pxe
+    
+    ipmitool -H 10.100.10.95 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis power reset && sleep 10 && \
+    ipmitool -H 10.100.10.96 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis power reset && sleep 10 && \
+    ipmitool -H 10.100.10.97 -U "${IPMI_USER}" -P "${IPMI_PASS}" chassis power reset
+    ```
+
  - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page.
    - Acquire: Assign the target hosts to this MAAS user.
