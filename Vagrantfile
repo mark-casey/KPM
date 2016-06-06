@@ -56,7 +56,11 @@ Vagrant.configure(2) do |config|
 
     # MAAS VM Vagrant guest
     config.vm.define "kpm-maaspxe", primary: false do |maas|
-        maas.vm.box = "geerlingguy/ubuntu1604"
+
+        # This commit has to land in next Vagrant release before we can use a Xenial box...:
+        # https://github.com/mitchellh/vagrant/commit/0505771481222b4893daa5454ff6c9c16f471fa4
+        # because of: https://github.com/mitchellh/vagrant/issues/7155
+        maas.vm.box = "ubuntu/wily64"
         maas.vm.hostname = "kpm-maaspxe"
         # 'vagrant up' will prompt for interface choice(s) if bridge(s) not set here
         maas.vm.network :public_network, ip: maasvm_ipminet_ip #, bridge: 'Intel(R) Ethernet Connection I217-LM'
