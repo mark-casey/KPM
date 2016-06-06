@@ -96,7 +96,7 @@ Vagrant.configure(2) do |config|
             bash setup.bash
             rm setup.bash
 
-            export MAAS_ADMIN_APIKEY="$(maas-region apikey --username ${MAAS_ADMIN_USER})"
+            export MAAS_ADMIN_APIKEY="$(maas-region-admin apikey --username ${MAAS_ADMIN_USER})"
             sed -i "s,_url_find_replace_unique_,${MAASVM_API_URL}," /vagrant/kolla_deployer/ansible_maas_dynamic_inventory.py
             sed -i "s,_token_find_replace_unique_,${MAAS_ADMIN_APIKEY}," /vagrant/kolla_deployer/ansible_maas_dynamic_inventory.py
         SHELL
