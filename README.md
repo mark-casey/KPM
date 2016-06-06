@@ -48,7 +48,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
         ```
         # tools
         sudo apt-get -qy update
-        sudo apt-get -qy install curl git ipmitool vim
+        sudo apt-get -qy install curl git ipmitool vim wget
         
         # install appropriate Vagrant
         wget https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1_x86_64.deb
@@ -66,8 +66,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
         
         # make Kolla build images and deploy faster
         # DO NOT USE THIS (the nobarrier flag) IN PRODUCTION UNLESS YOU HAVE
-        # THE EQUIPMENT AND KNOW HOW TO MAKE IT "SAFE" (OR WANT TO LOSE
-        # DATA ON WHEN THERE IS A POWER OUTAGE)
+        # THE EQUIPMENT AND KNOW HOW TO MAKE IT "SAFE" (OR IF YOU WANT TO
+        # LOSE DATA ON WHEN THERE IS A POWER OUTAGE)
         sudo mount / -o remount,nobarrier,noatime,nodiratime
         
         # run Docker's installer
@@ -78,7 +78,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
  - Log out and log back in for docker group changes to take effect
 
- - Set/override vars. These are primarily scoped to this repo and used in its Vagrantfile. They are used in configuring MAAS and $DPLYR_MGMTNET_IP, for example, is passed in to the kpm-kolla container and used as the docker registry push target when building container images with Kolla. While you may need to set these again for some things (perhaps you removed the kpm-kolla container and need to recreate it to rebuild container images and run a 'kolla-ansible upgrade'), these are NOT directly referenced in day-to-day cloud operation.  
+ - Set/override vars. These are primarily scoped to this repo and used in this Vagrantfile. They are used in configuring MAAS and $DPLYR_MGMTNET_IP, for example, is passed in to the kpm-kolla container and used as the docker registry push target when building container images with Kolla. While you may need to set these again for some things (perhaps you removed the kpm-kolla container and need to recreate it to rebuild container images and run a 'kolla-ansible upgrade'), these are NOT directly referenced in day-to-day cloud operation.  
     ```
     export DPLYR_MGMTNET_IP='10.101.10.15'  # the SI host
     export MAASVM_IPMINET_IP='10.100.10.16'  # the MAAS VM's IP on the IPMI network
@@ -97,11 +97,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 ### Finish configuring MAAS
 
- - Add public SSH key to the user you will be logged into MAAS as when deploying (presumably $MAAS_ADMIN_USER).
-     - Recent MAAS 2.0 beta releases seem to be missing the Add SSH Key button in the web UI. See https://github.com/ropsoft/mass_script/blob/master/setup.bash for commands to recreate CLI login to MAAS, and then add key with:
-       ```maas "${MAAS_ADMIN_USER}" sshkeys create key="ssh-rsa AAAAB3N... your_key_comment"```
+ - Add the public SSH key you want to use for logging in to deployed nodes to the user you will be logged into MAAS as when deploying them.
  - Enable DHCP and DNS from MAAS on the mgmt interface:
-     - Recent MAAS 2.0 beta releases have this under "Take action" at the top left on the page found by clicking to config the VLAN assigned to the fabric of the desired interface/subnet.
 
 ### Install OSes with MAAS
 
@@ -122,7 +119,11 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
  - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page. You should select the option "Allow SSH access and prevent machine from powering off" when running the Commission process.
    - Acquire: Assign the target hosts to this MAAS user.
-   - If installing with coreos-install, follow those instructions then skip the Deploy stage below and continue with tagging hosts.
+   - Note on CoreOS: Custom images seem to not be working in MAAS at the moment. If installing with coreos-install, perform the following steps, then skip the Deploy stage below them and continue with tagging hosts.
+     - Once the nodes have been Commissioned and Aquired:
+       ```
+       foobar, steps, more foobar
+       ```  
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
