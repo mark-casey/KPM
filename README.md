@@ -147,8 +147,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
    ```
    vagrant up kpm-preg --provider=docker
    vagrant up kpm-kolla --provider=docker
-   # note image ID of built container and use on next line
-   docker run -it -e "DPLYR_MGMTNET_IP=${DPLYR_MGMTNET_IP}" -v /var/run/docker.sock:/var/run/docker.sock -v ~/.ssh:/root/.ssh_from_si_host:ro da8fdca3cea7
+   docker tag da8fdca3cea7 kpm-kolla  # substitute in the image ID of the just-built image
+   docker run -it -e "DPLYR_MGMTNET_IP=${DPLYR_MGMTNET_IP}" -v /var/run/docker.sock:/var/run/docker.sock -v ~/.ssh:/root/.ssh_from_si_host:ro kpm-kolla
    ```
 
 
