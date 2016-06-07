@@ -117,7 +117,6 @@ Vagrant.configure(2) do |config|
 
     config.vm.define "kpm-kolla", primary: false do |deployer|
         deployer.vm.provider "docker" do |d2|
-            d2.name="kpm-kolla"
             d2.build_dir = "./kolla_deployer"
             d2.remains_running = false
             #d2.has_ssh = false
