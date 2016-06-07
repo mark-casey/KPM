@@ -123,7 +123,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
  - Once the nodes appear in the MAAS interface, you will "Commission", "Acquire", and then "Deploy" them.
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page. You should select the option "Allow SSH access and prevent machine from powering off" when running the Commission process.
    - Acquire: Assign the target hosts to this MAAS user.
-   - **Note on CoreOS**: Custom images seem to not be working in MAAS at the moment. If installing with coreos-install, skip the Deploy stage below them and continue with tagging hosts. CoreOS installation will happen after building and entering the kpm-kolla container.
+   - **Note on CoreOS**: Custom images seem to not be working in MAAS at the moment. If installing with coreos-install, skip the Deploy stage below and continue with tagging hosts. CoreOS installation will happen after building and entering the kpm-kolla container.
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
