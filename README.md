@@ -108,7 +108,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     vim .ssh/id_rsa  # paste private key in
     chmod 600 .ssh/id_rsa
     vim .ssh/id_rsa.pub  # paste public key in
-    ```  
+    ```
+
  - In the MAAS web interface:
    - Add the public half of the SSH key to the MAAS user that will be used for the deploy.
    - Enable DHCP and DNS from MAAS on the mgmt interface. As of MAAS 1.9.x you must set a static and dynamic DHCP range that does not overlap and is not otherwise in use.
