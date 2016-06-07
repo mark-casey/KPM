@@ -156,12 +156,7 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
    ```
    cd
-   # add the public and private parts of the key that was added to the MAAS user
-   mkdir .ssh
-   vim .ssh/id_rsa  # paste private key in
-   chmod 600 .ssh/id_rsa
-   vim .ssh/id_rsa.pub  # paste public key in
-   
+
    #coreos-install
    
    # test dynamic inventory
