@@ -10,4 +10,12 @@ then
     dynamic_inven_hostnames_and_ips() { /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py --nodes | grep -E "hostname|ip_address\".+[0-9]{1,3}[\", ]+$" | sed "N;s/\n//"; } && \
     IFS=$'\n\b'; for hosts_entry in $(dynamic_inven_hostnames_and_ips); do echo "${hosts_entry}" | sed -e 's/hostname":\|ip_address\|[", ]//g' -e 's/:/\t/' | awk '{print $2"\011"$1}' | tee -a /etc/hosts; done; unset IFS
     ###
+
+    # also take .ssh files passed in by local user on SI host and copy them for use by root within the container
+    cd
+    if [ -d .ssh_from_si_host ]
+    then
+        cp -a .ssh_from_si_host .ssh
+        chown -R root:
+    fi
 fi
