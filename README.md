@@ -101,8 +101,17 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 
 ### Finish configuring MAAS
 
- - Add the public SSH key you want to use for logging in to deployed nodes to the user you will be logged into MAAS as when deploying them.
- - Enable DHCP and DNS from MAAS on the mgmt interface:
+- On the actual, physical SI host (not inside a Vagrant machine), add the keypair you will use to SSH in to the nodes once deployed:  
+    ```
+    cd  # do this from the local account's $HOME
+    mkdir .ssh
+    vim .ssh/id_rsa  # paste private key in
+    chmod 600 .ssh/id_rsa
+    vim .ssh/id_rsa.pub  # paste public key in
+    ```  
+ - In the MAAS web interface:
+   - Add the public half of the SSH key to the MAAS user that will be used for the deploy.
+   - Enable DHCP and DNS from MAAS on the mgmt interface. As of MAAS 1.9.x you must set a static and dynamic DHCP range that does not overlap and is not otherwise in use.
 
 ### Install OSes with MAAS
 
