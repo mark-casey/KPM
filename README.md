@@ -42,9 +42,12 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
 ### SI Host Install
 
  - Install an OS on the SI (Supporting Infrastructure) host. Ubuntu 15.10 Wily x64 used for creating this document.
-   - You should have one NIC connected to the IPMI network with a DHCP address.
-   - You should have one NIC connected to the management network with a static IP address, as described above. (10.101.10.15 was used here, with the NAT router located at 10.101.10.1)
-   - Install an SSH server on the SI host, then SSH to it on the management interface and continue with the following installs:  
+   - You should be prompted to create a local account during install.
+   - After install set up your two network interfaces such that:
+     - You have one NIC connected to the IPMI network with a DHCP address. The address you recieve on this interface does not matter for the most part, it just allows you to issue IPMI commands to your nodes.
+     - You have one NIC connected to the management network with a static IP address, as described above. (10.101.10.15 was used here, with the NAT router located at 10.101.10.1)
+     - Your have a single default gateway which is set to the NAT router and uses the interface on the management network.
+   - Install an SSH server on the SI host, then SSH to it on the management interface as the local user created during install and then continue with the following installs:  
         ```
         # tools
         sudo apt-get -qy update
@@ -73,7 +76,8 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
         # run Docker's installer
         sudo su root -c "curl -sSL https://get.docker.io | bash"
         
-        #sudo usermod -aG docker USER_CHOSEN_AT_OS_INSTALL_GOES_HERE
+        # add your user to the docker group
+        sudo usermod -aG docker "$(whoami)"
         ```
 
  - Log out and log back in for docker group changes to take effect
