@@ -18,7 +18,7 @@ RUN apt-get -q -y update && \
 
 ADD ansible_maas_dynamic_inventory.py /usr/local/share/kolla/ansible/inventory
 ADD .bash_profile /root
-ADD pre.yml /root
+ADD post_pxe_hostprep.yml /root
 
 RUN chmod 755 /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py
 
