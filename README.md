@@ -10,7 +10,7 @@ A single bare metal host is deployed with Vagrant, Docker, and Virtualbox (or si
 ![](layout2.png)
 
 The SI host runs several Vagrant machines, each containing a piece of supporting infrastructure. These Vagrant machines are arranged as follows:
- - Running under Vagrant's virtualbox provider, a virtual machine (kpm-maas) running MAAS to handle PXE-boot services and IPMI power management
+ - Running under Vagrant's virtualbox provider, a virtual machine (kpm-maaspxe) running MAAS to handle PXE-boot services and IPMI power management
  - Running under Vagrant's docker provider, a container (kpm-preg) running Docker's registry:2 private registry image for Kolla to use
  - Also running under Vagrant's docker provider, a container (kpm-kolla) that acts as Kolla's deployer/operator host, and is where the command to build (build.py / kolla-build) container images for Kolla is run.
 
@@ -93,10 +93,10 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
     #export MAAS_ADMIN_PASS='admin'
     ```
 
- - Check out repo and bring up kpm-maas  
+ - Check out repo and bring up kpm-maaspxe  
     ```
     git clone https://github.com/ropsoft/KPM.git && cd KPM
-    vagrant up kpm-maas --provider=virtualbox
+    vagrant up kpm-maaspxe --provider=virtualbox
     ```
 
 ### Finish configuring MAAS
