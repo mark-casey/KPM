@@ -16,6 +16,6 @@ then
     if [ -d .ssh_from_si_host ]
     then
         cp -a .ssh_from_si_host .ssh
-        chown -R root:
+        chown -R root: .ssh
     fi
 fi
