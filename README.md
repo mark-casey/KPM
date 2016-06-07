@@ -124,14 +124,13 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
    - Commission: Boot a minimal environment to gather information on hardware and add a 'maas' user for IPMI access which will be auto-filled-in on each host's config page. You should select the option "Allow SSH access and prevent machine from powering off" when running the Commission process.
    - Acquire: Assign the target hosts to this MAAS user.
    - Note on CoreOS: Custom images seem to not be working in MAAS at the moment. If installing with coreos-install, perform the following steps, then skip the Deploy stage below them and continue with tagging hosts.
-     - Once the nodes have been Commissioned and Aquired:
+     - Once the nodes have been Commissioned and Aquired:  
        ```
-       foobar, steps, more foobar
+       
        ```  
    - Deploy: Choose to install Ubuntu Wily with the hwe (hardware enablement) kernel option.
  - Tag hosts in MAAS
 
-### Test dynamic inventory from within deployment container
 
 
 
@@ -145,18 +144,26 @@ The vlan terminology used here is described in terms of "vlan is untagged for po
    # note image ID of built container and use on next line
    docker run -it -e "DPLYR_MGMTNET_IP=${DPLYR_MGMTNET_IP}" -v /var/run/docker.sock:/var/run/docker.sock da8fdca3cea7
    ```
-   
- - Run inside deployer after ^^^
-   
+
+
+- Run these steps within the kpm-kolla container after entering it in the last command of the section above:
+
    ```
    cd
-   kolla-genpwd
-   # change value of --threads based on CPU of physical host
-   kolla-build --base ubuntu --type source --threads 16 --registry "${DPLYR_MGMTNET_IP}":5000 --push
-   sed -i -e 's/^#*kolla_base_distro:.*/kolla_base_distro: "ubuntu"/' -e 's/^#*kolla_install_type:.*/kolla_install_type: "source"/' -e 's/^#*kolla_internal_vip_address:.*/kolla_internal_vip_address: "10.101.0.215"/' -e "s/^#*docker_registry:.*/docker_registry: \"${DPLYR_MGMTNET_IP}:5000\"/" /etc/kolla/globals.yml
+   # add the public and private parts of the key that was added to the MAAS user
    mkdir .ssh
    vim .ssh/id_rsa  # paste private key in
    chmod 600 .ssh/id_rsa
+   vim .ssh/id_rsa.pub  # paste public key in
+   
+   #coreos-install
+   
+   # test dynamic inventory
+   /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py --list
+   # change value of --threads based on CPU of physical host
+   kolla-build --base ubuntu --type source --threads 16 --registry "${DPLYR_MGMTNET_IP}":5000 --push
+   sed -i -e 's/^#*kolla_base_distro:.*/kolla_base_distro: "ubuntu"/' -e 's/^#*kolla_install_type:.*/kolla_install_type: "source"/' -e 's/^#*kolla_internal_vip_address:.*/kolla_internal_vip_address: "10.101.0.215"/' -e "s/^#*docker_registry:.*/docker_registry: \"${DPLYR_MGMTNET_IP}:5000\"/" /etc/kolla/globals.yml
+   # the next line was used on Ubuntu nodes but not now that we're deploying CoreOS
    #ansible -i /usr/local/share/kolla/ansible/inventory/ansible_maas_dynamic_inventory.py -u ubuntu -m shell -a 'sudo cp .ssh/authorized_keys /root/.ssh/authorized_keys' all
    ANSIBLE_SSH_PIPELINING=1 ansible-playbook -i /usr/local/share/kolla/ansible/inventory/ pre.yml
    ANSIBLE_SSH_PIPELINING=1 kolla-ansible prechecks --inventory /usr/local/share/kolla/ansible/inventory/
